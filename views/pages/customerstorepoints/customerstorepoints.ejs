@@ -1,0 +1,134 @@
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Customer Store Points</h4>
+    </div>
+
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <input
+            type="text"
+            class="form-control"
+            id="search"
+            placeholder="Search"
+          />
+        </div>
+      </div>
+      <div class="row mt-2 table-responsive">
+        <table id="datatable" class="table table-hover table-bordered">
+          <thead class="thead-dark">
+            <th>ID</th>
+            <th>Name</th>
+            <th>Points</th>
+            <th>Status</th>
+            <th>Action</th>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div
+    class="modal fade"
+    id="editModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header custom-bg">
+          <h5 class="modal-title" id="exampleModalLabel">
+            Customer Store Point
+          </h5>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="custom-modal-body">
+          <div class="card">
+            <div class="card-header py-2 header-bg">
+              <h6 class="m-0 font-weight-bold table-title">Store Point:</h6>
+            </div>
+            <div class="card-body">
+              <div class="row mb-2 justify-content-center">
+                <div class="col-md-6">
+                  <div class="input-group mb-3">
+                    <input
+                      autocomplete="off"
+                      id="idmodal"
+                      name="idmodal"
+                      type="text"
+                      class="form-control"
+                      placeholder="Enter new idmodal"
+                      aria-label="idmodal"
+                      aria-describedby="basic-addon1"
+                      disabled
+                    />
+                    <div class="input-group-append">
+                      <span class="input-group-text">ID</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="input-group mb-3">
+                    <input
+                      autocomplete="off"
+                      id="pointsmodal"
+                      name="pointsmodal"
+                      type="number"
+                      class="form-control"
+                      placeholder="Entter additional points"
+                      aria-label="pointsmodal"
+                      aria-describedby="basic-addon1"
+                    />
+
+                    <div class="input-group-append">
+                      <span class="input-group-text">Store Points</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            id="closeBtn"
+            class="btn btn-outline-inventory"
+            data-dismiss="modal"
+          >
+            Close
+          </button>
+          <button
+            type="button"
+            id="updateBtn"
+            class="btn btn-outline-inventory"
+          >
+            <span id="btn-label-modal">Update</span>
+            <span
+              id="btnSpinner-modal"
+              class="spinner-border spinner-border-sm d-none"
+              role="status"
+              aria-hidden="true"
+            ></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,290 @@
+<script>
+  $(document).ready(function () {
+    let id = "";
+    let customerid = "";
+    LoadTable();
+
+    $("#datatable tbody").on("click", "tr", function () {
+      var dataRow = [];
+      $(this)
+        .closest("tr")
+        .find("td")
+        .each(function () {
+          dataRow.push($(this).text());
+        });
+      console.log(dataRow);
+      id = dataRow[0];
+      customerid = dataRow[2];
+    });
+
+    $(document).on("click", "#addBtn", function () {
+      let order = $("#order").val();
+      let message = "";
+
+      console.log(order);
+
+      if (order == "") {
+        message += "order Name";
+      }
+
+      if (message != "") {
+        warning("Required", message);
+      } else {
+        $.ajax({
+          type: "POST",
+          url: "/order/save",
+          data: {
+            name: order,
+          },
+          success: function (result) {
+            if (result.msg == "success") {
+              LoadTable();
+              success("Success", "New order successfully added!");
+            }
+            if (result.msg == "exist") {
+              warning("Success", `${order} is already exist!`);
+            }
+          },
+          error: function (error) {
+            warning("Error", error);
+          },
+        });
+      }
+    });
+
+    $(document).on("click", "#editBtn", function () {
+      $("#idmodal").val(id);
+      $("#editModal").modal("show");
+      $("#ordermodal").val(name);
+      console.log(id);
+    });
+    //Edit Update
+    $(document).on("click", "#saveBtn", function () {
+      let ordermodal = $("#ordermodal").val();
+
+      var message = "";
+
+      if (ordermodal == "") {
+        message += "order ";
+      }
+
+      if (message != "") {
+        warning("Required", `Please fill up ${message}`);
+      } else {
+        $.ajax({
+          type: "PUT",
+          url: "/order/edit",
+          data: {
+            order: ordermodal,
+            id: id,
+          },
+          success: function (result) {
+            if (result.msg == "success") {
+              LoadTable();
+              success("Saved", "Successfully");
+              $("#editModal").modal("hide");
+              $("#ordermodal").val("");
+            }
+
+            if (result.msg == "exist") {
+              warning("Exist", `${ordermodal} already exist!`);
+            }
+          },
+          error: function (err) {
+            warning("Warning", err);
+          },
+        });
+      }
+    });
+
+    //Status Update
+    $(document).on("click", "#approveBtn", function () {
+      $.ajax({
+        type: "PUT",
+        url: "/order/approve",
+        data: {
+          id: id,
+          customerid: customerid,
+        },
+        success: function (result) {
+          if (result.msg == "success") {
+            LoadTable();
+            success("Update", "Status change successfully");
+          }
+
+          if (result.msg == "notexist") {
+            warning(`${id} does not exist!`);
+          }
+        },
+        error: function (err) {
+          warning("Warning", err);
+        },
+      });
+    });
+
+    $(document).on("click", "#deliverBtn", function () {
+      $.ajax({
+        type: "PUT",
+        url: "/order/deliver",
+        data: {
+          id: id,
+          customerid: customerid,
+        },
+        success: function (result) {
+          if (result.msg == "success") {
+            LoadTable();
+            success("Saved", "Status change successfully");
+          }
+
+          if (result.msg == "notexist") {
+            warning(`${id} does not exist!`);
+          }
+        },
+        error: function (err) {
+          warning("Warning", err);
+        },
+      });
+    });
+
+    $(document).on("click", "#completeBtn", function () {
+      $.ajax({
+        type: "PUT",
+        url: "/order/complete",
+        data: {
+          id: id,
+          customerid: customerid,
+        },
+        success: function (result) {
+          if (result.msg == "success") {
+            LoadTable();
+            success("Saved", "Status change successfully");
+          }
+
+          if (result.msg == "notexist") {
+            warning(`${id} does not exist!`);
+          }
+        },
+        error: function (err) {
+          warning("Warning", err);
+        },
+      });
+    });
+
+    function LoadTable() {
+      $.ajax({
+        url: "/order/load",
+        method: "GET",
+        dataType: "json",
+        success: function (data) {
+          console.log(data);
+          if (data.msg === "success") {
+            populatedatatable(data.data);
+          } else {
+            console.error(data.msg);
+          }
+        },
+        error: function (error) {
+          console.error(error);
+        },
+      });
+    }
+
+    function populatedatatable(data) {
+      console.log(data);
+      const tableBody = $("#datatable tbody");
+      tableBody.empty();
+
+      if (data.length === 0) {
+        const tr = $("<tr>").append(
+          $("<td>", {
+            colspan: 6,
+            class: "text-center",
+            text: "No Data Matched",
+          })
+        );
+        tableBody.append(tr);
+      } else {
+        data.forEach((item) => {
+          let action = "";
+          let location = "";
+          let address = "";
+          let order = "";
+          let orderlist = "";
+          if (item.status === "PENDING") {
+            action = `
+              <span class="editbutton mr-2" id="viewBtn" name="viewBtn" data-toggle="modal" data-target="#viewModal"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>
+              <span class="editbutton mr-2" id="approveBtn" name="approveBtn"><i class="fas fa-check" style="color: rgb(99, 115, 129);"></i></span>
+              <span class="editbutton" id="cancelBtn" name="cancelBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-times" style="color: rgb(99, 115, 129);"></i></span>`;
+          }
+
+          if (item.status === "PREPARING") {
+            action = `<span class="editbutton mr-2" id="deliverBtn" name="deliverBtn"><i class="fas fa-truck" style="color: rgb(99, 115, 129);"></i></span>`;
+          }
+
+          if (item.status === "FOR DELIVERY") {
+            action = `<span class="editbutton mr-2" id="completeBtn" name="completeBtn"><i class="fas fa-truck-loading" style="color: rgb(99, 115, 129);"></i></span>`;
+          }
+          const statusBackground = getStatusBackground(item.status);
+          const containerBackground = getContainerBackground(item.status);
+
+          let detailsJson = JSON.parse(item.details);
+          detailsJson.forEach((item) => {
+            console.log(item);
+            location = item.location;
+            address = item.address;
+            order = item.cart;
+          });
+
+          order.forEach((item) => {
+            console.log(item);
+            orderlist += `${item.name} x ${item.quantity}\n`;
+          });
+
+          const tr = $("<tr>").append(
+            $("<td>", {
+              text: item.id,
+              "data-label": "ID",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.date,
+              "data-label": "order",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.customerid,
+              "data-label": "order",
+              class: "custom-mobile-align",
+            }),
+
+            $("<td>", {
+              "data-label": "order",
+              class: "custom-mobile-align",
+            }).append(
+              $("<div>").append(
+                $("<span>", { text: `Address: ${address}` })
+                  .append($("<br>"))
+                  .append($("<span>", { text: `Location: ${location}` }))
+              )
+            ),
+            $("<td>", {
+              class: "custom-mobile-align",
+              "data-label": "Status",
+            }).append(
+              $("<div>", { class: containerBackground }).append(
+                $("<span>", { text: item.status, class: statusBackground })
+              )
+            ),
+            $("<td>", {
+              html: action,
+              "data-label": "Action",
+              class: "actionWidth",
+            })
+          );
+
+          tableBody.append(tr);
+        });
+      }
+    }
+  });
+</script>

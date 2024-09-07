@@ -15,6 +15,18 @@ exports.Encrypter = (password, callback) => {
   }
 };
 
+exports.EncryptString = (password) => {
+  try {
+    let cipher = crypto.createCipheriv(algorithm, Securitykey, initVector);
+    let encryptedData = cipher.update(password, "utf-8", "hex");
+    encryptedData += cipher.final("hex");
+
+    return encryptedData;
+  } catch (error) {
+    throw error;
+  }
+};
+
 exports.Decrypter = (hash, callback) => {
   try {
     let decipher = crypto.createDecipheriv(algorithm, Securitykey, initVector);

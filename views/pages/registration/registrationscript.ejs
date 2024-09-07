@@ -1,0 +1,68 @@
+<script>
+  $(document).ready(function () {
+    let id = "";
+    let fullname = "";
+    let address = "";
+    let email = "";
+    let contactno = "";
+    let status = "";
+
+    $(document).on("click", "#registerBtn", function () {
+      let fullname = $("#fullname").val();
+      let contactno = $("#contactno").val();
+      let address = $("#address").val();
+      let email = $("#email").val();
+      let password = $("#password").val();
+      let confirmpassword = $("#confirmpassword").val();
+      let message = "";
+
+      if (fullname == "") {
+        message += "Fullfullname";
+      }
+      if (contactno == "") {
+        message += "Contact No";
+      }
+      if (email == "") {
+        message += "Email";
+      }
+      if (address == "") {
+        message += "Address";
+      }
+
+      if (message != "") {
+        warning("Required", message);
+      } else {
+        if (password != confirmpassword) {
+          warning("Error", "Password does not match!");
+          return;
+        } else {
+          $.ajax({
+            type: "POST",
+            url: "/registration/register",
+            data: {
+              fullname: fullname,
+              contactno: contactno,
+              address: address,
+              email: email,
+              password: password,
+            },
+            success: function (result) {
+              if (result.msg == "success") {
+                success("Success", "New customer successfully added!");
+                setTimeout(() => {
+                  window.location.href = "/";
+                }, 2000);
+              }
+              if (result.msg == "exist") {
+                warning("Success", `${fullname} account already exist!`);
+              }
+            },
+            error: function (error) {
+              warning("Error", error);
+            },
+          });
+        }
+      }
+    });
+  });
+</script>

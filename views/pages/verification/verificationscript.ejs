@@ -1,0 +1,52 @@
+<script>
+  $(document).ready(function () {
+    $(document).on("click", "#verifyBtn", function () {
+      let smscode = $("#smscode").val();
+      let id = `<%= activitionid %>`;
+      let message = "";
+
+      if (smscode == "") {
+        message += "SMS Code";
+      }
+
+      if (message != "") {
+        warning("Required", message);
+      } else {
+        $.ajax({
+          type: "POST",
+          url: "/verification/verifysmscode",
+          data: {
+            id: id,
+            smscode: smscode,
+          },
+          success: function (result) {
+            if (result.msg == "success") {
+              $.ajax({
+                type: "DELETE",
+                url: "/verification/delete",
+                data: {
+                  id: id,
+                },
+                success: function (result) {
+                  console.log(result);
+                  success("Success", "Account verified successfully!");
+                  setTimeout(() => {
+                    window.location.replace("/login");
+                  }, 2000);
+                },
+                error: function (error) {
+                  console.log(error);
+                },
+              });
+            } else {
+              warning("Invalid", "Invalid SMS Code");
+            }
+          },
+          error: function (error) {
+            warning("Error", error);
+          },
+        });
+      }
+    });
+  });
+</script>

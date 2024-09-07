@@ -1,0 +1,99 @@
+<script>
+  $(document).ready(function () {
+    LoadTable();
+
+    $("#search").keyup(function () {
+      var search = $(this).val().toLowerCase();
+      $("tbody tr").filter(function () {
+        $(this).toggle($(this).text().toLowerCase().indexOf(search) > -1);
+      });
+    });
+
+    function LoadTable() {
+      $.ajax({
+        url: "/customerorderhistory/customer/<%= customerid%>",
+        method: "GET",
+        dataType: "json",
+
+        success: function (data) {
+          console.log(data);
+          if (data.msg === "success") {
+            populatedatatable(data.data);
+          } else {
+            console.error(data.msg);
+          }
+        },
+        error: function (error) {
+          console.error(error);
+        },
+      });
+    }
+
+    function populatedatatable(data) {
+      console.log(data);
+      const tableBody = $("#datatable tbody");
+      tableBody.empty();
+
+      if (data.length === 0) {
+        const tr = $("<tr>").append(
+          $("<td>", {
+            colspan: 7,
+            class: "text-center",
+            text: "No Data Matched",
+          })
+        );
+        tableBody.append(tr);
+      } else {
+        data.forEach((item) => {
+          let order = "";
+          let orderlist = "";
+          const statusBackground = getStatusBackground(item.status);
+          const containerBackground = getContainerBackground(item.status);
+
+          let detailsJson = JSON.parse(item.details);
+          detailsJson.forEach((item) => {
+            console.log(item);
+            order = item.cart;
+          });
+
+          order.forEach((item) => {
+            console.log(item);
+            orderlist += `<tr><td class="text-left">${item.name}<td class="text-center">X</td></td> <td class="text-right">${item.quantity}</td></tr>`;
+          });
+
+          const tr = $("<tr>").append(
+            $("<td>", {
+              text: item.id,
+              "data-label": "ID",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.date,
+              "data-label": "Date",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              "data-label": "Address",
+              class: "custom-mobile-align",
+            }).append("<tr>", orderlist, { class: "custom-mobile-align" }),
+            $("<td>", {
+              text: item.paymentmethod,
+              "data-label": "Contact No",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              class: "custom-mobile-align",
+              "data-label": "Status",
+            }).append(
+              $("<div>", { class: containerBackground }).append(
+                $("<span>", { text: item.status, class: statusBackground })
+              )
+            )
+          );
+
+          tableBody.append(tr);
+        });
+      }
+    }
+  });
+</script>

@@ -1,0 +1,162 @@
+<script>
+  $(document).ready(function () {
+    let id = "";
+    let name = "";
+    let status = "";
+    LoadTable();
+    LoadList();
+
+    $("#datatable tbody").on("click", "tr", function () {
+      var dataRow = [];
+      $(this)
+        .closest("tr")
+        .find("td")
+        .each(function () {
+          dataRow.push($(this).text());
+        });
+      console.log(dataRow);
+      id = dataRow[0];
+      name = dataRow[1];
+      status = dataRow[2];
+    });
+
+    $(document).on("click", "#addBtn", function () {
+      let productname = $("#product").val();
+      let product = $("#productID").val();
+      let quantity = $("#quantity").val();
+      let message = "";
+      let update_msg = "";
+
+      console.log(product);
+
+      if (product == "") {
+        message += "Product";
+      }
+
+      if (quantity == "") {
+        message += "Quantity";
+      }
+
+      if (quantity < 0) {
+        update_msg += "adjustment";
+      } else {
+        update_msg += "replenish";
+      }
+
+      if (message != "") {
+        warning("Required", message);
+      } else {
+        $.ajax({
+          type: "POST",
+          url: "/inventory/save",
+          data: {
+            product: product,
+            quantity: quantity,
+          },
+          success: function (result) {
+            if (result.msg == "success") {
+              LoadTable();
+              success("Success", "New inventory successfully added!");
+            }
+            if (result.msg == "update") {
+              LoadTable();
+              success(
+                "Success",
+                `${productname} successfully ${quantity} ${update_msg}.`
+              );
+            }
+          },
+          error: function (error) {
+            warning("Error", error);
+          },
+        });
+      }
+    });
+
+    function LoadTable() {
+      $.ajax({
+        url: "/inventory/load",
+        method: "GET",
+        dataType: "json",
+        success: function (data) {
+          console.log(data);
+          if (data.msg === "success") {
+            populatedatatable(data.data);
+          } else {
+            console.error(data.msg);
+          }
+        },
+        error: function (error) {
+          console.error(error);
+        },
+      });
+    }
+
+    function populatedatatable(data) {
+      console.log(data);
+      const tableBody = $("#datatable tbody");
+      tableBody.empty();
+
+      if (data.length === 0) {
+        const tr = $("<tr>").append(
+          $("<td>", {
+            colspan: 3,
+            class: "text-center",
+            text: "No Data Matched",
+          })
+        );
+        tableBody.append(tr);
+      } else {
+        data.forEach((item) => {
+          const tr = $("<tr>").append(
+            $("<td>", {
+              text: item.id,
+              "data-label": "ID",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.productid,
+              "data-label": "Product",
+              class: "custom-mobile-align",
+            }),
+
+            $("<td>", {
+              text: item.stock,
+              "data-label": "Stocks",
+              class: "custom-mobile-align",
+            })
+          );
+
+          tableBody.append(tr);
+        });
+      }
+    }
+
+    function LoadList() {
+      $.ajax({
+        type: "GET",
+        url: "/product/getproductinventory",
+        success: function (result) {
+          let activeData = [];
+          let dropdownID = "productDropdown";
+          let inputID = "product";
+          let hiddenID = "productID";
+          let container = result.data;
+          //console.log(container);
+          $.each(container, (key, item) => {
+            let name = item.name;
+            let id = item.id;
+            activeData.push({
+              display: name,
+              value: id,
+            });
+          });
+          AddDropdownData(dropdownID, activeData, inputID, hiddenID);
+        },
+        error: function (err) {
+          warning("Warning", err);
+        },
+      });
+    }
+  });
+</script>

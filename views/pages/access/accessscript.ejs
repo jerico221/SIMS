@@ -50,7 +50,7 @@
             error: function (error) {
               warning("Error", error);
             },
-          });
+          });   
         }
       });
   
@@ -67,7 +67,7 @@
         var message = "";
   
         if (accessmodal == "") {
-          message += "Accesss ";
+          message += "access ";
         }
   
         if (message != "") {
@@ -152,6 +152,31 @@
         });
       });
   
+      $(document).on("click", "#deletebutton", function () {
+        console.log(id);
+        console.log(status);
+        $.ajax({
+          type: "DELETE",
+          url: "/access/delete",
+          data: {
+            id: id,
+          },
+          success: function (result) {
+            if (result.msg == "success") {
+              LoadTable();
+              success("Saved", "Delete successfully");
+            }
+  
+            if (result.msg == "notexist") {
+              warning(`${id} does not exist!`);
+            }
+          },
+          error: function (err) {
+            warning("Warning", err);
+          },
+        });
+      });
+  
       function LoadTable() {
         $.ajax({
           url: "/access/load",
@@ -191,11 +216,13 @@
             if (item.status === "ACTIVE") {
               action = `
                               <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
-                              <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: rgb(99, 115, 129);"></i></span>`;
+                              <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: rgb(99, 115, 129);"></i></span>
+                              <span class="editbutton" id="deletebutton"><i class="fas fa-trash" style="color: rgb(99, 115, 129);"></i></span>`;
             } else if (item.status === "INACTIVE") {
               action = `
                               <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
-                              <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>`;
+                              <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>
+                               <span class="editbutton" id="deletebutton"><i class="fas fa-trash" style="color: rgb(99, 115, 129);"></i></span>`;
             }
             const statusBackground = getStatusBackground(item.status);
             const containerBackground = getContainerBackground(item.status);

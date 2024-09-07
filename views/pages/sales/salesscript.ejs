@@ -1,0 +1,111 @@
+<script>
+  $(document).ready(function () {
+    let id = "";
+    let status = "";
+    LoadTable();
+
+    $("#datatable tbody").on("click", "tr", function () {
+      var dataRow = [];
+      $(this)
+        .closest("tr")
+        .find("td")
+        .each(function () {
+          dataRow.push($(this).text());
+        });
+      console.log(dataRow);
+      id = dataRow[0];
+      status = dataRow[2];
+    });
+
+    function LoadTable() {
+      $.ajax({
+        url: "/sales/load",
+        method: "GET",
+        dataType: "json",
+        success: function (data) {
+          console.log(data);
+          if (data.msg === "success") {
+            populatedatatable(data.data);
+          } else {
+            console.error(data.msg);
+          }
+        },
+        error: function (error) {
+          console.error(error);
+        },
+      });
+    }
+
+    function populatedatatable(data) {
+      console.log(data);
+      const tableBody = $("#datatable tbody");
+      tableBody.empty();
+
+      if (data.length === 0) {
+        const tr = $("<tr>").append(
+          $("<td>", {
+            colspan: 6,
+            class: "text-center",
+            text: "No Data Matched",
+          })
+        );
+        tableBody.append(tr);
+      } else {
+        data.forEach((item) => {
+          let action = "";
+          if (item.status === "ACTIVE") {
+            action = `
+                              <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+                              <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: rgb(99, 115, 129);"></i></span>
+                              <span class="editbutton" id="deletebutton"><i class="fas fa-trash" style="color: rgb(99, 115, 129);"></i></span>`;
+          } else if (item.status === "INACTIVE") {
+            action = `
+                              <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+                              <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>
+                               <span class="editbutton" id="deletebutton"><i class="fas fa-trash" style="color: rgb(99, 115, 129);"></i></span>`;
+          }
+          const statusBackground = getStatusBackground(item.status);
+          const containerBackground = getContainerBackground(item.status);
+
+          const tr = $("<tr>").append(
+            $("<td>", {
+              text: item.id,
+              "data-label": "ID",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.date,
+              "data-label": "Date",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.pos,
+              "data-label": "POS",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: formatCurrency(item.total),
+              "data-label": "Total",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              class: "custom-mobile-align",
+              "data-label": "Status",
+            }).append(
+              $("<div>", { class: containerBackground }).append(
+                $("<span>", { text: item.status, class: statusBackground })
+              )
+            ),
+            $("<td>", {
+              html: action,
+              "data-label": "Action",
+              class: "actionWidth",
+            })
+          );
+
+          tableBody.append(tr);
+        });
+      }
+    }
+  });
+</script>

@@ -8,12 +8,13 @@ const {
 const { StatusMessage } = require("./repository/disctionary");
 const { Select, InsertTable, Update } = require("./repository/dbconnect");
 const { DataModeling } = require("./model/dbmodel");
+const { Validator } = require("./controller/validator");
 
 var router = express.Router();
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("poslayout", { title: "Express" });
+  Validator(req, res, "poslayout");
 });
 
 module.exports = router;
@@ -108,11 +109,9 @@ router.put("/status", (req, res) => {
 
 router.put("/edit", (req, res) => {
   try {
-    let namemodal = req.body.pos;
-    let serialmodal = req.body.serial;
-    let id = req.body.id;
+    const { posnamemodal, id, serialmodal } = req.body;
 
-    let data = [namemodal, serialmodal, id];
+    let data = [posnamemodal, serialmodal, id];
 
     let updateStatement = UpdateStatement(
       "pos",
@@ -123,13 +122,13 @@ router.put("/edit", (req, res) => {
 
     let checkStatement = SelectStatement(
       "select * from pos where p_name=? and p_serial=?",
-      [namemodal, serialmodal]
+      [posnamemodal, serialmodal]
     );
 
     Check(checkStatement)
       .then((result) => {
         if (result != 0) {
-          return res.json({ msg: 'exist' });
+          return res.json({ msg: "exist" });
         } else {
           Update(updateStatement, data, (err, result) => {
             if (err) console.error("Error: ", err);
@@ -149,5 +148,48 @@ router.put("/edit", (req, res) => {
   } catch (error) {
     console.log(error);
     res.json({ msg: error });
+  }
+});
+
+router.delete("/delete", (req, res) => {
+  try {
+    let id = req.body.id;
+    let sql = "delete from pos where p_id=?";
+    let cmd = SelectStatement(sql, [id]);
+
+    Select(cmd, (error, result) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).send({ msg: error });
+      }
+
+      res.status(200).send({ msg: "success" });
+    });
+  } catch (error) {
+    res.status(500).send({ msg: error });
+  }
+});
+
+router.post("/sync", (req, res) => {
+  try {
+    const { posid } = req.body;
+    let sql = "select * from pos where p_id=?";
+    let cmd = SelectStatement(sql, [posid]);
+
+    Select(cmd, (error, result) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).send({ msg: error });
+      }
+
+      if (result.length != 0) {
+        let data = DataModeling(result, "p_");
+        return res.status(200).send({ msg: "success", data: data });
+      } else {
+        return res.status(200).send({ msg: "success", data: result });
+      }
+    });
+  } catch (error) {
+    res.status(500).send({ msg: error });
   }
 });

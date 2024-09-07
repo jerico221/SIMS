@@ -1,0 +1,438 @@
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+<script>
+  $(document).ready(function () {
+    let cart = [];
+    let details = [];
+    var itemcart = 0;
+    LoadProductDisplay();
+
+    let row_index = "";
+    let current_count = 0;
+    let current_price = 0;
+    let current_brand = "";
+    let current_itemtype = "";
+    let current_row_index = "";
+    let current_row = "";
+
+    $("#carttable tbody").on("click", "tr", function () {
+      var dataRow = [];
+      row_index = this;
+      current_row_index = $(this).index() + 1;
+      current_row = $(this).closest("tr");
+      $(this)
+        .closest("tr")
+        .find("td")
+        .each(function () {
+          dataRow.push($(this).text());
+        });
+      current_count = parseFloat(dataRow[2]);
+      current_price = parseFloat(RemoveCurrencyFormatting(dataRow[1]));
+      console.log(dataRow);
+      console.log(current_row_index);
+    });
+
+    $(document).on("click", ".btnaddcart", function (e) {
+      e.preventDefault();
+      //   console.log(this.id);
+      let productname = $(`#productName${this.id}`).val();
+      let productprice = $(`#productPrice${this.id}`).val();
+      let productimage = $(`#image${this.id}`).attr("src");
+
+      let found = false;
+      cart.forEach((item) => {
+        if (item.id == this.id) {
+          item.quantity += 1;
+          found = true;
+        }
+      });
+
+      details.forEach((item) => {
+        if (item.id == this.id) {
+          item.quantity += 1;
+          found = true;
+        }
+      });
+      if (!found) {
+        cart.push({
+          image: productimage,
+          id: this.id,
+          name: productname,
+          price: productprice,
+          quantity: 1,
+        });
+        details.push({
+          id: this.id,
+          name: productname,
+          price: productprice,
+          quantity: 1,
+        });
+      }
+
+      itemcart += 1;
+
+      $("#counter").text(itemcart);
+    });
+
+    $(document).on("click", ".btnadd", function (e) {
+      e.preventDefault();
+      //   console.log(this.id);
+
+      let found = false;
+      cart.forEach((item) => {
+        if (item.id == this.id) {
+          current_count += 1;
+          $(`#carttable tr:eq(${current_row_index}) td:eq(2)`).text(
+            `${current_count}`
+          );
+
+          let current_subtotal = current_count * current_price;
+          $(`#carttable tr:eq(${current_row_index}) td:eq(3)`).text(
+            `${formatCurrency(current_subtotal)}`
+          );
+
+          item.quantity += 1;
+          found = true;
+        }
+      });
+
+      details.forEach((item) => {
+        if (item.id == this.id) {
+          $(`#carttable tr:eq(${current_row_index}) td:eq(2)`).text(
+            `${current_count}`
+          );
+
+          let current_subtotal = current_count * current_price;
+          $(`#carttable tr:eq(${current_row_index}) td:eq(3)`).text(
+            `${formatCurrency(current_subtotal)}`
+          );
+
+          found = true;
+        }
+      });
+      if (!found) {
+        cart.push({
+          image: productimage,
+          id: this.id,
+          name: productname,
+          price: productprice,
+          quantity: 1,
+        });
+        details.push({
+          id: this.id,
+          name: productname,
+          price: productprice,
+          quantity: 1,
+        });
+      }
+
+      itemcart += 1;
+
+      $("#counter").text(itemcart);
+    });
+
+    $(document).on("click", ".btnminus", function (e) {
+      e.preventDefault();
+      //   console.log(this.id);
+
+      let found = false;
+      cart.forEach((item) => {
+        if (item.id == this.id) {
+          current_count -= 1;
+          $(`#carttable tr:eq(${current_row_index}) td:eq(2)`).text(
+            `${current_count}`
+          );
+          if (current_count == 0) {
+            current_row.remove();
+            cart.splice(current_row_index - 1, 1);
+          } else {
+            $(
+              `#request-stocks-list-tbl tr:eq(${current_row_index}) td:eq(2)`
+            ).text(`${current_count}`);
+
+            let current_subtotal = current_count * current_price;
+            $(`#carttable tr:eq(${current_row_index}) td:eq(3)`).text(
+              `${formatCurrency(current_subtotal)}`
+            );
+          }
+
+          item.quantity -= 1;
+          found = true;
+        }
+      });
+
+      details.forEach((item) => {
+        if (item.id == this.id) {
+          $(`#carttable tr:eq(${current_row_index}) td:eq(2)`).text(
+            `${current_count}`
+          );
+          if (current_count == 0) {
+            current_row.remove();
+            cart.splice(current_row_index - 1, 1);
+          } else {
+            $(
+              `#request-stocks-list-tbl tr:eq(${current_row_index}) td:eq(2)`
+            ).text(`${current_count}`);
+
+            let current_subtotal = current_count * current_price;
+            $(`#carttable tr:eq(${current_row_index}) td:eq(3)`).text(
+              `${formatCurrency(current_subtotal)}`
+            );
+          }
+
+          found = true;
+        }
+      });
+
+      if (!found) {
+        cart.push({
+          image: productimage,
+          id: this.id,
+          name: productname,
+          price: productprice,
+          quantity: 1,
+        });
+
+        details.push({
+          id: this.id,
+          name: productname,
+          price: productprice,
+          quantity: 1,
+        });
+      }
+
+      itemcart -= 1;
+      $("#counter").text(itemcart);
+    });
+
+    $(document).on("click", ".btnremove", function (e) {
+      e.preventDefault();
+      //   console.log(this.id);
+
+      let found = false;
+      cart.forEach((item) => {
+        if (item.id == this.id) {
+          current_row.remove();
+          cart.splice(current_row_index - 1, 1);
+        }
+
+        item.quantity -= 1;
+        found = true;
+      });
+
+      itemcart -= current_count;
+      $("#counter").text(itemcart);
+    });
+
+    $(document).on("click", "#cartitems", function (e) {
+      console.log(cart);
+
+      const tableBody = $("#carttable tbody");
+      tableBody.empty();
+
+      cart.forEach((item) => {
+        let action = `
+          <button class="btnadd btn-info btn-sm" id="${item.id}" data-id="${item.id}" ><i class="fas fa-plus"></i></button>
+          <button class="btnminus btn-info btn-sm" id="${item.id}" data-id="${item.id}" ><i class="fas fa-minus"></i></button>
+           <button class="btnremove btn-danger btn-sm" id="${item.id}" data-id="${item.id}" ><i class="fas fa-trash"></i></button>
+          `;
+
+        const tr = $("<tr>").append(
+          $("<td>", {
+            html: $(
+              `<img src="${item.image}" alt="Product Image" class="product-image" style="max-width: 100px; max-height: 85px;"/>
+                <p>${item.name}</p>`
+            ),
+            "data-label": "Product Image",
+          }),
+          $("<td>", {
+            text: formatCurrency(item.price),
+            "data-label": "Price",
+            class: "custom-mobile-align",
+          }),
+          $("<td>", {
+            text: item.quantity,
+            "data-label": "Enable Inventory",
+            class: "custom-mobile-align",
+          }),
+          $("<td>", {
+            text: formatCurrency(item.price * item.quantity),
+            "data-label": "Enable Inventory",
+            class: "custom-mobile-align",
+          }),
+          $("<td>", {
+            html: action,
+            "data-label": "Action",
+            class: "actionWidth",
+          })
+        );
+
+        tableBody.append(tr);
+      });
+    });
+
+    $("#checkoutBtn").click(function () {
+      if (itemcart === 0) {
+        warning("Warning", "Cart is empty");
+      } else {
+        $("#map").html(
+          '<div class="row justify-content-center"><p>Please wait while map is rendering...</p></div>'
+        );
+        setTimeout(initMap, 3000);
+        $("#cartModal").modal("hide");
+        $("#checkoutModal").modal("show");
+      }
+    });
+
+    $("#backBtn").click(function () {
+      $("#cartModal").modal("show");
+      $("#checkoutModal").modal("hide");
+    });
+
+    $(document).on("click", "#proceedBtn", function () {
+      let location = $("#location").val();
+      let address = $("#address").val();
+      let payment = $("#payment").val();
+      let message = "";
+
+      if (location == "") {
+        message += "Lcoation ";
+      }
+      if (address == "") {
+        message += "Address ";
+      }
+      if (payment == "--") {
+        message += "Payment ";
+      }
+
+      if (message != "") {
+        warning("Required", `${message} is required!`);
+      } else {
+        let data = [
+          {
+            location: location,
+            address: address,
+            payment: payment,
+            cart: details,
+          },
+        ];
+        $.ajax({
+          type: "POST",
+          url: "/order/save",
+          data: {
+            details: JSON.stringify(data),
+            paymentmethod: payment,
+          },
+          success: function (result) {
+            if (result.msg == "success") {
+              cart = [];
+              itemcart = 0;
+              $("#checkoutModal").modal("hide");
+              success("Success", "New order successfully added!");
+            } else if (result.msg == "exist") {
+              warning("Success", `There is an existing order!`);
+            }
+          },
+          error: function (error) {
+            warning("Error", error);
+          },
+        });
+      }
+    });
+
+    //#region Map
+    function initMap() {
+      var map = L.map("map").setView(
+        [14.354357375074542, 121.06166547256524],
+        17
+      );
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "© OpenStreetMap",
+      }).addTo(map);
+
+      var marker;
+
+      // Add click event listener to the map
+      map.on("click", function (e) {
+        var lat = e.latlng.lat;
+        var lng = e.latlng.lng;
+
+        // If a marker exists, remove it
+        if (marker) {
+          map.removeLayer(marker);
+        }
+
+        $("#location").val(`${lat},${lng}`);
+        reverseGeocode(lat, lng);
+
+        // Add a marker at the clicked location
+        marker = L.marker([lat, lng])
+          .addTo(map)
+          .bindPopup(
+            "You clicked the map at: <br>Latitude: " +
+              lat +
+              "<br>Longitude: " +
+              lng
+          )
+          .openPopup();
+      });
+    }
+
+    function reverseGeocode(lat, lng) {
+      var url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          var address = data.display_name;
+          $("#address").val(address);
+          // warning("Current Location", "Address: " + address);
+        })
+        .catch((error) => {
+          console.error("Error with reverse geocoding:", error);
+        });
+    }
+
+    //#endregion
+    function LoadProductDisplay() {
+      $.ajax({
+        url: "/product/load",
+        type: "GET",
+        success: function (data) {
+          let result = data.data;
+
+          result.forEach((item) => {
+            let res = `
+                  <div class="product-card mr-2">
+                      <img id="image${item.id}" src="data:image/png;base64,${
+              item.image
+            }" alt="Product 1 Image" class="product-image" style="width: 200px; height: 200px;" />
+                      <div class="product-name">${item.name}</div>
+                      <div  class="product-price">${formatCurrency(item.price)}
+                      </div>
+                      <input type="hidden" id="productId" value="${item.id}" />
+                      <input type="hidden" id="productName${item.id}" value="${
+              item.name
+            }" />
+                      <input type="hidden" id="productPrice${item.id}" value="${
+              item.price
+            }" />
+                      <div class="row mt-2 justify-content-center">
+                          <button id="${
+                            item.id
+                          }" class="btn btn-success btnaddcart btn-sm w-75">Add to Cart</button>
+                      </div>
+                  </div>
+  `;
+            $("#productdisplay").append(res);
+          });
+        },
+        error: function (error) {
+          console.log(error);
+        },
+      });
+    }
+  });
+</script>

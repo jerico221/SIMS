@@ -1,0 +1,49 @@
+<script>
+  $(document).ready(function () {
+    $(document).on("click", "#loginBtn", function () {
+      let username = $("#username").val();
+      let password = $("#password").val();
+      let message = "";
+      console.log(username, password);
+
+      if (username == "") {
+        message += "Username ";
+      }
+      if (password == "") {
+        message += "Password ";
+      }
+
+      if (message != "") {
+        warning("Required", message);
+      } else {
+        $.ajax({
+          type: "POST",
+          url: "/login/login",
+          data: {
+            username: username,
+            password: password,
+          },
+          success: function (result) {
+            console.log(result.msg);
+            
+            if (result.msg == "success") {
+              location.replace("/");
+            }
+            if(result.msg == 'customer'){
+              location.replace("/productdisplay");
+            }
+            if(result.msg == 'inactive'){
+              warning("Not Active", "To activate account please check you email to verify your account");
+            }
+            if (result.msg == "failed") {
+              warning("Failed", "Username or password is incorrect!");
+            }
+          },
+          error: function (error) {
+            warning("Error", error);
+          },
+        });
+      }
+    });
+  });
+</script>

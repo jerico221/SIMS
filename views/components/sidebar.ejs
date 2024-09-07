@@ -1,5 +1,5 @@
 <ul
-  class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion"
+  class="navbar-nav bg-gradient-secondary sidebar sidebar-dark accordion"
   id="accordionSidebar"
 >
   <!-- Sidebar - Brand -->
@@ -10,7 +10,7 @@
     <div class="sidebar-brand-icon">
       <i class="fas fa-home"></i>
     </div>
-    <div class="sidebar-brand-text mx-3">Navas's Kitchen</div>
+    <div class="sidebar-brand-text mx-3">SIMS</div>
   </a>
 
   <!-- Divider -->
@@ -22,6 +22,39 @@
       <i class="fas fa-fw fa-tachometer-alt"></i>
       <span>Dashboard</span></a
     >
+  </li>
+
+  <!-- Divider -->
+  <hr class="sidebar-divider" />
+
+  <!-- Heading -->
+  <div class="sidebar-heading">Masters</div>
+
+  <!-- Nav Item - Pages Collapse Menu -->
+  <li class="nav-item">
+    <a
+      class="nav-link collapsed"
+      href="#"
+      data-toggle="collapse"
+      data-target="#masterCollapse"
+      aria-expanded="true"
+      aria-controls="masterCollapse"
+    >
+      <i class="fas fa-fw fa-box"></i>
+      <span>Master</span>
+    </a>
+    <div
+      id="masterCollapse"
+      class="collapse"
+      aria-labelledby="headingTwo"
+      data-parent="#accordionSidebar"
+    >
+      <div class="bg-white py-2 collapse-inner rounded">
+        <h6 class="collapse-header">Masters Components:</h6>
+        <a class="collapse-item" href="/access">Access</a>
+        <a class="collapse-item" href="/payment">Payment</a>
+      </div>
+    </div>
   </li>
 
   <!-- Divider -->
@@ -116,6 +149,9 @@
       <div class="bg-white py-2 collapse-inner rounded">
         <h6 class="collapse-header">Sales Components:</h6>
         <a class="collapse-item" href="/sales">Sales</a>
+        <h6 class="collapse-header">Order Components:</h6>
+        <a class="collapse-item" href="/order">Orders</a>
+        <h6 class="collapse-header">Point of Sale Components:</h6>
         <a class="collapse-item" href="/pos">POS</a>
       </div>
     </div>
@@ -148,7 +184,9 @@
     >
       <div class="bg-white py-2 collapse-inner rounded">
         <h6 class="collapse-header">Customer Components:</h6>
-        <a class="collapse-item" href="/customer">Sales</a>
+        <a class="collapse-item" href="/customer">Customer</a>
+        <h6 class="collapse-header">Store Point Components:</h6>
+        <a class="collapse-item" href="/customerstorepoints">Store Points</a>
       </div>
     </div>
   </li>
@@ -212,8 +250,8 @@
     >
       <div class="bg-white py-2 collapse-inner rounded">
         <h6 class="collapse-header">User Components:</h6>
+        <a class="collapse-item" href="/employee">Employee</a>
         <a class="collapse-item" href="/users">Users</a>
-        <a class="collapse-item" href="/access">Access</a>
       </div>
     </div>
   </li>
@@ -254,7 +292,7 @@
   <hr class="sidebar-divider d-none d-md-block" />
 
   <!-- Sidebar Toggler (Sidebar) -->
-  <!-- <div class="text-center d-none d-md-inline">
+  <div class="text-center d-none d-md-inline">
     <button class="rounded-circle border-0" id="sidebarToggle"></button>
-  </div> -->
+  </div>
 </ul>

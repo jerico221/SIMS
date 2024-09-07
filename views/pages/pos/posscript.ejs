@@ -23,16 +23,17 @@
 
     $(document).on("click", "#addBtn", function () {
       let pos = $("#posname").val();
-      let serial = $("#posserial").val();
+      let serial = $("#serial").val();
       let message = "";
 
       console.log(pos);
 
       if (pos == "") {
-        message += "POS Name ";
+        message += "POS Name";
       }
+
       if (serial == "") {
-        message += "Serial ";
+        message += "Serial";
       }
 
       if (message != "") {
@@ -65,22 +66,22 @@
       $("#idmodal").val(id);
       $("#editModal").modal("show");
       $("#posnamemodal").val(name);
-      $("#posserialmodal").val(serial);
+      $("#serialmodal").val(serial);
       console.log(id);
     });
     //Edit Update
     $(document).on("click", "#saveBtn", function () {
       let posnamemodal = $("#posnamemodal").val();
-      let posserialmodal = $("#posserialmodal").val();
+      let serialmodal = $("#serialmodal").val();
 
       var message = "";
 
       if (posnamemodal == "") {
-        message += "POS Name ";
+        message += "pos ";
       }
 
-      if (posserialmodal == "") {
-        message += "POS Serial ";
+      if (serialmodal == "") {
+        message += "serial ";
       }
 
       if (message != "") {
@@ -90,8 +91,8 @@
           type: "PUT",
           url: "/pos/edit",
           data: {
-            pos: posnamemodal,
-            serial: posserialmodal,
+            posnamemodal: posnamemodal,
+            serialmodal: serialmodal,
             id: id,
           },
           success: function (result) {
@@ -99,8 +100,7 @@
               LoadTable();
               success("Saved", "Successfully");
               $("#editModal").modal("hide");
-              $("#posnamemodal").val("");
-              $("#posserialmodal").val("");
+              $("#posmodal").val("");
             }
 
             if (result.msg == "exist") {
@@ -167,6 +167,31 @@
       });
     });
 
+    $(document).on("click", "#deletebutton", function () {
+      console.log(id);
+      console.log(status);
+      $.ajax({
+        type: "DELETE",
+        url: "/pos/delete",
+        data: {
+          id: id,
+        },
+        success: function (result) {
+          if (result.msg == "success") {
+            LoadTable();
+            success("Saved", "Delete successfully");
+          }
+
+          if (result.msg == "notexist") {
+            warning(`${id} does not exist!`);
+          }
+        },
+        error: function (err) {
+          warning("Warning", err);
+        },
+      });
+    });
+
     function LoadTable() {
       $.ajax({
         url: "/pos/load",
@@ -194,7 +219,7 @@
       if (data.length === 0) {
         const tr = $("<tr>").append(
           $("<td>", {
-            colspan: 5,
+            colspan: 4,
             class: "text-center",
             text: "No Data Matched",
           })
@@ -206,11 +231,13 @@
           if (item.status === "ACTIVE") {
             action = `
                               <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
-                              <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: rgb(99, 115, 129);"></i></span>`;
+                              <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: rgb(99, 115, 129);"></i></span>
+                              <span class="editbutton" id="deletebutton"><i class="fas fa-trash" style="color: rgb(99, 115, 129);"></i></span>`;
           } else if (item.status === "INACTIVE") {
             action = `
                               <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
-                              <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>`;
+                              <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>
+                               <span class="editbutton" id="deletebutton"><i class="fas fa-trash" style="color: rgb(99, 115, 129);"></i></span>`;
           }
           const statusBackground = getStatusBackground(item.status);
           const containerBackground = getContainerBackground(item.status);

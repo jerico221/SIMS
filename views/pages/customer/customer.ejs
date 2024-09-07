@@ -1,0 +1,363 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xl-7">
+      <div class="card shadow mb-4 cardbody-size-710">
+        <div class="progress progress-sm mb-2">
+          <div
+            class="progress-bar"
+            role="progressbar"
+            style="width: 0%"
+            aria-valuenow="0"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          ></div>
+        </div>
+        <div class="card-header py-3 header-bg">
+          <div class="row">
+            <div class="col-md-5">
+              <div class="row">
+                <h6 class="mt-2 ml-3 font-weight-bold h4 label-title">
+                  Customer
+                </h6>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-group">
+                <input
+                  autocomplete="off"
+                  type="text"
+                  class="form-control bg-light small"
+                  placeholder="Search for..."
+                  aria-label="Search"
+                  aria-describedby="basic-addon2"
+                  id="search-input"
+                />
+                <div class="input-group-append">
+                  <button
+                    class="btn sis-btn-color"
+                    type="button"
+                    id="search-button"
+                  >
+                    <i class="fas fa-search fa-sm"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-1">
+              <div class="row d-flex justify-content-center">
+                <button class="btn btn-outline-inventory ml-2" id="convertopdf">
+                  <i class="fas fa-download fa-sm"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive scroll-cardbody-size-710 border">
+            <table
+              id="datatable"
+              class="table table-bordered custom-mobile-table"
+              width="100%"
+              cellspacing="10"
+            >
+              <thead class="table-header">
+                <tr>
+                  <th>ID</th>
+                  <th>Fullname</th>
+                  <th>Address</th>
+                  <th>Contact No</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-5">
+      <div class="card shadow cardbody-size-710">
+        <div class="card-header header-bg">
+          <div class="row">
+            <div class="col">
+              <h6 class="m-0 font-weight-bold mt-2 label-title h4">
+                Add Employee
+              </h6>
+            </div>
+          </div>
+        </div>
+        <div class="card-body extend">
+          <div class="row">
+            <div class="col">
+              <div class="input-group mb-3">
+                <input
+                  id="fullname"
+                  name="fullname"
+                  type="text"
+                  class="form-control"
+                  placeholder="Fullname"
+                  aria-label="Fullname"
+                  autocomplete="off"
+                />
+                <div class="input-group-append">
+                  <span class="input-group-text">Fullname</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6">
+              <div class="input-group mb-3">
+                <input
+                  id="address"
+                  name="address"
+                  type="text"
+                  class="form-control"
+                  placeholder="Address"
+                  aria-label="Address"
+                  autocomplete="off"
+                />
+                <div class="input-group-append">
+                  <span class="input-group-text">Address</span>
+                </div>
+              </div>
+            </div>
+            <!-- 
+              <div class="col-lg-6 col-md-6 col-sm-6">
+                <div class="input-group mb-3">
+                  <input
+                    id="access"
+                    name="access"
+                    type="text"
+                    class="form-control"
+                    placeholder="Select Access"
+                    aria-label="Select Access"
+                    autocomplete="off"
+                  />
+                  <input
+                    autocomplete="off"
+                    type="hidden"
+                    id="accessID"
+                    name="accessID"
+                  />
+                  <div class="input-group-append">
+                    <span class="input-group-text">Access</span>
+                  </div>
+                </div>
+                <div
+                  class="custom-dropdown cdw-tableoption"
+                  id="accessDropdown"
+                ></div>
+              </div> -->
+          </div>
+          <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6">
+              <div class="input-group mb-3">
+                <input
+                  id="contactno"
+                  name="contactno"
+                  type="phone"
+                  class="form-control"
+                  placeholder="Contact No"
+                  aria-label="Contact No"
+                  autocomplete="off"
+                />
+                <div class="input-group-append">
+                  <span class="input-group-text">Contact No</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-6 col-md-6 col-sm-6">
+              <div class="input-group mb-3">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  class="form-control"
+                  placeholder="Email"
+                  aria-label="Email"
+                  autocomplete="off"
+                />
+
+                <div class="input-group-append">
+                  <span class="input-group-text">Email</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row justify-content-center mt-2">
+            <button
+              class="btn btn-sm btn-outline-inventory w-75"
+              type="button"
+              id="addBtn"
+            >
+              Add
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div
+    class="modal fade"
+    id="editModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header custom-bg">
+          <h5 class="modal-title" id="exampleModalLabel">Customer</h5>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="custom-modal-body">
+          <div class="card">
+            <div class="card-header py-2 header-bg">
+              <h6 class="m-0 font-weight-bold table-title">
+                Customer Employee:
+              </h6>
+            </div>
+            <div class="card-body">
+              <div class="row mb-2 justify-content-center">
+                <div class="col-md-6">
+                  <div class="input-group mb-3">
+                    <input
+                      autocomplete="off"
+                      id="idmodal"
+                      name="idmodal"
+                      type="text"
+                      class="form-control"
+                      placeholder="Enter new idmodal"
+                      aria-label="idmodal"
+                      aria-describedby="basic-addon1"
+                      disabled
+                    />
+                    <div class="input-group-append">
+                      <span class="input-group-text">ID</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="input-group mb-3">
+                    <input
+                      autocomplete="off"
+                      id="fullnamemodal"
+                      name="fullnamemodal"
+                      type="text"
+                      class="form-control"
+                      placeholder="Enter new Fullname"
+                      aria-label="fullnamemodal"
+                      aria-describedby="basic-addon1"
+                    />
+
+                    <div class="input-group-append">
+                      <span class="input-group-text">Fullname</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="input-group mb-3">
+                    <input
+                      autocomplete="off"
+                      id="addressmodal"
+                      name="addressmodal"
+                      type="text"
+                      class="form-control"
+                      placeholder="Enter new address"
+                      aria-label="addressmodal"
+                      aria-describedby="basic-addon1"
+                    />
+                    <div class="input-group-append">
+                      <span class="input-group-text">Address</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="input-group mb-3">
+                    <input
+                      autocomplete="off"
+                      id="contactnomodal"
+                      name="contactnomodal"
+                      type="text"
+                      class="form-control"
+                      placeholder="Enter new contact no"
+                      aria-label="contactnomodal"
+                      aria-describedby="basic-addon1"
+                    />
+
+                    <div class="input-group-append">
+                      <span class="input-group-text">Contact No</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="input-group mb-3">
+                    <input
+                      autocomplete="off"
+                      id="emailmodal"
+                      name="emailmodal"
+                      type="text"
+                      class="form-control"
+                      placeholder="Enter new email"
+                      aria-label="emailmodal"
+                      aria-describedby="basic-addon1"
+                    />
+                    <div class="input-group-append">
+                      <span class="input-group-text">Email</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            id="closeBtn"
+            class="btn btn-outline-inventory"
+            data-dismiss="modal"
+          >
+            Close
+          </button>
+          <button
+            type="button"
+            id="updateBtn"
+            class="btn btn-outline-inventory"
+          >
+            <span id="btn-label-modal">Update</span>
+            <span
+              id="btnSpinner-modal"
+              class="spinner-border spinner-border-sm d-none"
+              role="status"
+              aria-hidden="true"
+            ></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

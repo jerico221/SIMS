@@ -8,12 +8,13 @@ const {
 const { StatusMessage } = require("./repository/disctionary");
 const { Select, InsertTable, Update } = require("./repository/dbconnect");
 const { DataModeling } = require("./model/dbmodel");
+const { Validator } = require("./controller/validator");
 
 var router = express.Router();
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  res.render("accesslayout", { title: "Express" });
+  Validator(req, res, "accesslayout");
 });
 
 module.exports = router;
@@ -142,5 +143,24 @@ router.put("/edit", (req, res) => {
   } catch (error) {
     console.log(error);
     res.json({ msg: error });
+  }
+});
+
+router.delete("/delete", (req, res) => {
+  try {
+    let id = req.body.id;
+    let sql = "delete from access where a_id=?";
+    let cmd = SelectStatement(sql, [id]);
+
+    Select(cmd, (error, result) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).send({ msg: error });
+      }
+
+      res.status(200).send({ msg: "success" });
+    });
+  } catch (error) {
+    res.status(500).send({ msg: error });
   }
 });

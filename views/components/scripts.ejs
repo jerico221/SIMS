@@ -27,7 +27,9 @@
         <button class="btn btn-secondary" type="button" data-dismiss="modal">
           Cancel
         </button>
-        <a class="btn btn-primary" href="/login">Logout</a>
+        <button name="logoutBtn" id="logoutBtn" class="btn btn-primary">
+          Logout
+        </button>
       </div>
     </div>
   </div>
@@ -92,6 +94,10 @@
       case "RETURN":
         return "status-inprogress";
       case "IN PROGRESS":
+        return "status-inprogress";
+      case "PREPARING":
+        return "status-inprogress";
+      case "FOR DELIVERY":
         return "status-inprogress";
       case "DAMAGE":
         return "status-warning";
@@ -172,4 +178,133 @@
       hideMethod: "hide",
     });
   }
+
+  //#region Logout
+  $(document).on("click", "#logoutBtn", function () {
+    $.ajax({
+      type: "GET",
+      url: "/login/logout",
+      success: function (result) {
+        success("Logout", "Successfully");
+        location.replace("/");
+      },
+      error: function (err) {
+        warning("Error", err);
+      },
+    });
+  });
+  //#endregion
+
+  //#region New Dropdown
+  function AddDropdownData(dropdownID, activeData, inputID, hiddenID) {
+    for (const data of activeData) {
+      AddOption(dropdownID, data.display, data.value, inputID, hiddenID);
+    }
+  }
+
+  function AddOption(dropdownID, displayText, actualValue, inputID, hiddenID) {
+    const dropdownElement = document.getElementById(dropdownID);
+    const hiddenInput = document.getElementById(hiddenID);
+
+    const newOption = document.createElement("div");
+    newOption.className = "dropdown-option";
+    newOption.textContent = displayText;
+    newOption.setAttribute("data-value", actualValue);
+
+    newOption.addEventListener("click", function () {
+      const inputElement = document.getElementById(inputID);
+      inputElement.value = displayText;
+      hiddenInput.value = actualValue;
+      dropdownElement.style.display = "none";
+    });
+
+    dropdownElement.appendChild(newOption);
+
+    SetupDropdown(inputID, dropdownID, "dropdown-option");
+  }
+
+  function SetupDropdown(inputId, dropdownId, optionClass) {
+    const inputElement = document.getElementById(inputId);
+    const dropdownElement = document.getElementById(dropdownId);
+    const options = dropdownElement.getElementsByClassName(optionClass);
+
+    inputElement.addEventListener("click", function () {
+      dropdownElement.style.display = "block";
+    });
+
+    for (const option of options) {
+      option.addEventListener("click", function () {
+        inputElement.value = option.textContent;
+        const actualValue = option.getAttribute("data-value");
+        inputElement.setAttribute("data-actual-value", actualValue);
+        dropdownElement.style.display = "none";
+      });
+    }
+
+    inputElement.addEventListener("input", function () {
+      const value = inputElement.value.toUpperCase();
+      for (const option of options) {
+        if (option.textContent.toUpperCase().includes(value)) {
+          option.style.display = "block";
+        } else {
+          option.style.display = "none";
+        }
+      }
+      dropdownElement.style.display = "block";
+    });
+
+    document.addEventListener("click", function (event) {
+      const target = event.target;
+      if (!dropdownElement.contains(target) && target !== inputElement) {
+        dropdownElement.style.display = "none";
+      }
+    });
+  }
+  //#endregion
+
+  //#region Formatter
+  function formatPrice(event, input) {
+    event.preventDefault();
+
+    const cursorPosition = input.selectionStart;
+    const originalValue = input.value;
+    const defaultValue = "₱0.00";
+    const currentValue = originalValue || defaultValue;
+
+    let value = currentValue.replace(/[^0-9.]/g, "");
+    let number = parseFloat(value);
+
+    if (!isNaN(number)) {
+      const formattedValue = number.toLocaleString("en-PH", {
+        style: "currency",
+        currency: "PHP",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+      input.value = formattedValue;
+
+      let newPosition =
+        cursorPosition +
+        (formattedValue.indexOf(".") > currentValue.indexOf(".") ? 1 : 0);
+
+      // Set the new cursor position
+      input.setSelectionRange(newPosition, newPosition);
+    } else {
+      input.value = defaultValue;
+    }
+  }
+
+  function RemoveCurrencyFormatting(val) {
+    return val.replace(/[^\d.-]/g, "");
+  }
+
+  function formatCurrency(value) {
+    if (!value) {
+      return "₱0.00";
+    }
+    var formattedValue = parseFloat(value).toFixed(2);
+    return "₱" + formattedValue.replace(/\d(?=(\d{3})+\.)/g, "$&,");
+  }
+  //#endregion
 </script>

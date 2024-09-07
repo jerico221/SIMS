@@ -1,0 +1,490 @@
+<script>
+  $(document).ready(function () {
+    let id = "";
+    let name = "";
+    let category = "";
+    let price = 0;
+    let isinventory = 0;
+    let status = "";
+    let base64String = "";
+    let base64StringModal = "";
+    LoadTable();
+    LoadList();
+
+    $("#datatable tbody").on("click", "tr", function () {
+      var dataRow = [];
+      $(this)
+        .closest("tr")
+        .find("td")
+        .each(function () {
+          dataRow.push($(this).text());
+        });
+      console.log(dataRow);
+      id = dataRow[0];
+      name = dataRow[2];
+      category = dataRow[3];
+      price = dataRow[4];
+      isinventory = dataRow[5];
+      status = dataRow[6];
+    });
+
+    $(document).on("click", "#addBtn", function () {
+      let productname = $("#productname").val();
+      let category = $("#categoryID").val();
+      let price = RemoveCurrencyFormatting($("#price").val());
+      let isinventory = $("#isinventoryID").val();
+      let image = base64String;
+      let message = "";
+
+      console.log(isinventory);
+
+      if (productname == "") {
+        message += "Product Name";
+      }
+
+      if (category == "") {
+        message += "Category";
+      }
+
+      if (price == "") {
+        message += "Price";
+      }
+
+      if (message != "") {
+        warning("Required", message);
+      } else {
+        $.ajax({
+          type: "POST",
+          url: "/product/save",
+          data: {
+            name: productname,
+            category: category,
+            price: price,
+            isinventory: isinventory == 0 ? 0 : 1,
+            image: image == "" ? null : image,
+          },
+          success: function (result) {
+            if (result.msg == "success") {
+              LoadTable();
+              success("Success", "New pos successfully added!");
+            }
+            if (result.msg == "exist") {
+              warning("Success", `${pos} is already exist!`);
+            }
+          },
+          error: function (error) {
+            warning("Error", error);
+          },
+        });
+      }
+    });
+
+    $(document).on("click", "#editBtn", function () {
+      $("#idmodal").val(id);
+      $("#editModal").modal("show");
+      $("#productnamemodal").val(name);
+      $("#categorymodal").val(category);
+      $("#pricemodal").val(price);
+      $("#isinventorymodal").val(isinventory);
+      console.log(id);
+    });
+    //Edit Update
+    $(document).on("click", "#updateBtn", function () {
+      let productnamemodal = $("#productnamemodal").val();
+      let categorymodal = $("#categorymodalID").val();
+      let pricemodal = RemoveCurrencyFormatting($("#pricemodal").val());
+      let isinventorymodal = $("#isinventorymodalID").val();
+      let imagemodal = base64StringModal;
+
+      var message = "";
+
+      if (productnamemodal == "") {
+        message += "Product Name ";
+      }
+      if (message != "") {
+        warning("Required", `Please fill up ${message}`);
+      } else {
+        $.ajax({
+          type: "PUT",
+          url: "/product/edit",
+          data: {
+            name: productnamemodal,
+            category: categorymodal,
+            price: pricemodal,
+            isinventory: isinventorymodal,
+            image: imagemodal,
+            id: id,
+          },
+          success: function (result) {
+            if (result.msg == "success") {
+              LoadTable();
+              success("Saved", "Successfully");
+              $("#editModal").modal("hide");
+              $("#productnamemodal").val("");
+            }
+
+            if (result.msg == "exist") {
+              warning("Exist", `${productnamemodal} already exist!`);
+            }
+          },
+          error: function (err) {
+            warning("Warning", err);
+          },
+        });
+      }
+    });
+
+    //Status Update
+    $(document).on("click", "#activeBtn", function () {
+      console.log(id);
+      console.log(status);
+      $.ajax({
+        type: "PUT",
+        url: "/product/status",
+        data: {
+          status: status,
+          id: id,
+        },
+        success: function (result) {
+          if (result.msg == "success") {
+            LoadTable();
+            success("Update", "Status change successfully");
+          }
+
+          if (result.msg == "notexist") {
+            warning(`${id} does not exist!`);
+          }
+        },
+        error: function (err) {
+          warning("Warning", err);
+        },
+      });
+    });
+
+    $(document).on("click", "#inactiveBtn", function () {
+      console.log(id);
+      console.log(status);
+      $.ajax({
+        type: "PUT",
+        url: "/product/status",
+        data: {
+          status: status,
+          id: id,
+        },
+        success: function (result) {
+          if (result.msg == "success") {
+            LoadTable();
+            success("Saved", "Status change successfully");
+          }
+
+          if (result.msg == "notexist") {
+            warning(`${id} does not exist!`);
+          }
+        },
+        error: function (err) {
+          warning("Warning", err);
+        },
+      });
+    });
+
+    $(document).on("click", "#deletebutton", function () {
+      console.log(id);
+      console.log(status);
+      $.ajax({
+        type: "DELETE",
+        url: "/product/delete",
+        data: {
+          id: id,
+        },
+        success: function (result) {
+          if (result.msg == "success") {
+            LoadTable();
+            success("Saved", "Delete successfully");
+          }
+
+          if (result.msg == "notexist") {
+            warning(`${id} does not exist!`);
+          }
+        },
+        error: function (err) {
+          warning("Warning", err);
+        },
+      });
+    });
+
+    function LoadTable() {
+      $.ajax({
+        url: "/product/load",
+        method: "GET",
+        dataType: "json",
+        success: function (data) {
+          console.log(data);
+          if (data.msg === "success") {
+            populatedatatable(data.data);
+          } else {
+            console.error(data.msg);
+          }
+        },
+        error: function (error) {
+          console.error(error);
+        },
+      });
+    }
+
+    function populatedatatable(data) {
+      console.log(data);
+      const tableBody = $("#datatable tbody");
+      tableBody.empty();
+
+      if (data.length === 0) {
+        const tr = $("<tr>").append(
+          $("<td>", {
+            colspan: 8,
+            class: "text-center",
+            text: "No Data Matched",
+          })
+        );
+        tableBody.append(tr);
+      } else {
+        data.forEach((item) => {
+          let action = "";
+          if (item.status === "ACTIVE") {
+            action = `
+                                <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+                                <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: rgb(99, 115, 129);"></i></span>
+                                <span class="editbutton" id="deletebutton"><i class="fas fa-trash" style="color: rgb(99, 115, 129);"></i></span>`;
+          } else if (item.status === "INACTIVE") {
+            action = `
+                                <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+                                <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>
+                                 <span class="editbutton" id="deletebutton"><i class="fas fa-trash" style="color: rgb(99, 115, 129);"></i></span>`;
+          }
+          const statusBackground = getStatusBackground(item.status);
+          const containerBackground = getContainerBackground(item.status);
+
+          const tr = $("<tr>").append(
+            $("<td>", {
+              text: item.id,
+              "data-label": "ID",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              html: $(
+                '<img src="data:image/png;base64,' +
+                  item.image +
+                  '" alt="Product Image" class="product-image" style="max-width: 100px; max-height: 85px;"/>'
+              ),
+              "data-label": "Product Image",
+            }),
+            $("<td>", {
+              text: item.name,
+              "data-label": "Product Name",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.category,
+              "data-label": "Category",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: formatCurrency(item.price),
+              "data-label": "Price",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.isinventory == 0 ? "False" : "True",
+              "data-label": "Enable Inventory",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              class: "custom-mobile-align",
+              "data-label": "Status",
+            }).append(
+              $("<div>", { class: containerBackground }).append(
+                $("<span>", { text: item.status, class: statusBackground })
+              )
+            ),
+            $("<td>", {
+              html: action,
+              "data-label": "Action",
+              class: "actionWidth",
+            })
+          );
+
+          tableBody.append(tr);
+        });
+      }
+    }
+
+    function LoadList() {
+      $.ajax({
+        type: "GET",
+        url: "/category/load",
+        success: function (result) {
+          let activeData = [];
+          let dropdownID = "categoryDropdown";
+          let inputID = "category";
+          let hiddenID = "categoryID";
+          let dropdownmodalID = "categorymodalDropdown";
+          let inputmodalID = "categorymodal";
+          let hiddenmodalID = "categorymodalID";
+          let container = result.data;
+          //console.log(container)
+          $.each(container, (key, item) => {
+            if (item.status === "ACTIVE") {
+              let name = item.name;
+              let id = item.id;
+              activeData.push({
+                display: name,
+                value: id,
+              });
+            }
+          });
+          AddDropdownData(dropdownID, activeData, inputID, hiddenID);
+
+          AddDropdownData(
+            dropdownmodalID,
+            activeData,
+            inputmodalID,
+            hiddenmodalID
+          );
+        },
+        error: function (err) {
+          warning("Warning", err);
+        },
+      });
+
+      let activeData = [
+        { display: "True", value: 1 },
+        { display: "False", value: 0 },
+      ];
+      let dropdownID = "isinventoryDropdown";
+      let inputID = "isinventory";
+      let hiddenID = "isinventoryID";
+      let dropdownmodalID = "isinventorymodalDropdown";
+      let inputmodalID = "isinventorymodal";
+      let hiddenmodalID = "isinventorymodalID";
+      AddDropdownData(dropdownID, activeData, inputID, hiddenID);
+      AddDropdownData(dropdownmodalID, activeData, inputmodalID, hiddenmodalID);
+    }
+
+    //#region Process Image
+    $(document).on("change", "#imageInputModal", function () {
+      const input = document.getElementById("imageInputModal");
+      const file = input.files[0];
+
+      const reader = new FileReader();
+      reader.onload = function () {
+        const img = new Image();
+        img.src = reader.result;
+        img.onload = function () {
+          const maxWidth = 120;
+          const maxHeight = 120;
+
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth) {
+            height *= maxWidth / width;
+            width = maxWidth;
+          }
+
+          if (height > maxHeight) {
+            width *= maxHeight / height;
+            height = maxHeight;
+          }
+
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const base64StringModal = canvas.toDataURL("image/jpeg"); // You can change the format if needed
+
+          const preview = document.getElementById("productimagemodal");
+          preview.src = base64StringModal;
+
+          processedImage(base64StringModal);
+        };
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function processedImage() {
+      const input = document.getElementById("imageInputModal");
+      const file = input.files[0];
+
+      var reader = new FileReader();
+      // console.log("next");
+
+      reader.onload = function () {
+        base64StringModal = reader.result
+          .replace("data:", "")
+          .replace(/^.+,/, "");
+        // alert(imageBase64Stringsep);
+        // console.log(base64StringModal);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    $(document).on("change", "#imageInput", function () {
+      const input = document.getElementById("imageInput");
+      const file = input.files[0];
+
+      const reader = new FileReader();
+      reader.onload = function () {
+        const img = new Image();
+        img.src = reader.result;
+        img.onload = function () {
+          const maxWidth = 120;
+          const maxHeight = 120;
+
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth) {
+            height *= maxWidth / width;
+            width = maxWidth;
+          }
+
+          if (height > maxHeight) {
+            width *= maxHeight / height;
+            height = maxHeight;
+          }
+
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const resizedBase64 = canvas.toDataURL("image/jpeg"); // You can change the format if needed
+
+          const preview = document.getElementById("productimage");
+          preview.src = resizedBase64;
+
+          imageUploaded(resizedBase64);
+        };
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function imageUploaded() {
+      const input = document.getElementById("imageInput");
+      const file = input.files[0];
+
+      var reader = new FileReader();
+      // console.log("next");
+
+      reader.onload = function () {
+        base64String = reader.result.replace("data:", "").replace(/^.+,/, "");
+        // alert(imageBase64Stringsep);
+        //console.log(base64String);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    //#endregion
+  });
+</script>
