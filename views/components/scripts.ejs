@@ -1,0 +1,175 @@
+<!-- Logout Modal-->
+<div
+  class="modal fade"
+  id="logoutModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+        <button
+          class="close"
+          type="button"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Select "Logout" below if you are ready to end your current session.
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">
+          Cancel
+        </button>
+        <a class="btn btn-primary" href="/login">Logout</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap core JavaScript-->
+<script src="/vendor/jquery/jquery.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="/javascripts/js/sb-admin-2.min.js"></script>
+
+<!-- Page level plugins -->
+<script src="/vendor/chart.js/Chart.min.js"></script>
+
+<!-- TOASTR -->
+<script src="/javascripts/toastr.min.js"></script>
+
+<!-- XLSX -->
+<script src="/javascripts/xlsx.mini.min.js"></script>
+
+<!-- SWAL-->
+<script src="/javascripts/sweetalert.min.js"></script>
+
+<!-- Page level custom scripts
+<script src="/javascripts/js/demo/chart-area-demo.js"></script>
+<script src="/javascripts/js/demo/chart-pie-demo.js"></script> -->
+<script>
+  function messagePrompt(title, text, icon) {
+    return swal({
+      title: title,
+      text: text,
+      icon: `${icon}`,
+      buttons: {
+        confirm: {
+          text: "OK",
+          value: true,
+          visible: true,
+          className: "swal-button-ok",
+        },
+      },
+    });
+  }
+
+  function getStatusBackground(status) {
+    switch (status) {
+      case "REQUEST":
+        return "status-pending";
+      case "PENDING":
+        return "status-pending";
+      case "COMPLETED":
+        return "status-success";
+      case "ACTIVE":
+        return "status-success";
+      case "APPROVED":
+        return "status-success";
+      case "REPLACE":
+        return "status-inprogress";
+      case "RETURN":
+        return "status-inprogress";
+      case "IN PROGRESS":
+        return "status-inprogress";
+      case "DAMAGE":
+        return "status-warning";
+      case "INACTIVE":
+        return "status-warning";
+      case "CANCELLED":
+        return "status-warning";
+      default:
+        return "";
+    }
+  }
+
+  function getContainerBackground(status) {
+    switch (status) {
+      case "PENDING":
+        return "status-container-pd";
+      case "REQUEST":
+        return "status-container-pd";
+      case "COMPLETED":
+        return "status-container-sc";
+      case "ACTIVE":
+        return "status-container-sc";
+      case "APPROVED":
+        return "status-container-sc";
+      case "REPLACE":
+        return "status-container-inpg";
+      case "RETURN":
+        return "status-container-inpg";
+      case "IN PROGRESS":
+        return "status-container-inpg";
+      case "DAMAGE":
+        return "status-container-wr";
+      case "INACTIVE":
+        return "status-container-wr";
+      case "CANCELLED":
+        return "status-container-wr";
+      default:
+        return "";
+    }
+  }
+
+  function success(title, text) {
+    toastr.success(text, title, {
+      closeButton: false,
+      debug: false,
+      newestOnTop: true,
+      progressBar: true,
+      positionClass: "toast-top-right",
+      preventDuplicates: true,
+      onclick: null,
+      showDuration: "300",
+      hideDuration: "1000",
+      timeOut: "5000",
+      extendedTimeOut: "1000",
+      showEasing: "swing",
+      hideEasing: "linear",
+      showMethod: "fadeIn",
+      hideMethod: "fadeOut",
+    });
+  }
+
+  function warning(title, text) {
+    toastr.warning(text, title, {
+      closeButton: false,
+      debug: false,
+      newestOnTop: true,
+      progressBar: true,
+      positionClass: "toast-top-right",
+      preventDuplicates: true,
+      onclick: null,
+      showDuration: "300",
+      hideDuration: "1000",
+      timeOut: "5000",
+      extendedTimeOut: "1000",
+      showEasing: "swing",
+      hideEasing: "linear",
+      showMethod: "fadeIn",
+      hideMethod: "hide",
+    });
+  }
+</script>
