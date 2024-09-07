@@ -1,7 +1,7 @@
 <div class="card">
   <div class="card-body">
     <div class="row">
-      <div class="col-l-6 col-md-5 col-sm-4">
+      <div class="col-lg-6 col-md-4 col-sm-3">
         <div class="input-group mb-3">
           <input
             id="posname"
@@ -10,31 +10,36 @@
             class="form-control"
             placeholder="POS Name"
             aria-label="POS Name"
-            aria-describedby="basic-addon2"
+            aria-describedby="addBtn"
           />
-          <span class="input-group-text" id="basic-addon2">Name</span>
         </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-6 col-md-4 col-sm-3">
         <div class="input-group mb-3">
           <input
-            id="posserial"
-            name="posserial"
+            id="serial"
+            name="serial"
             type="text"
             class="form-control"
-            placeholder="POS Serial"
-            aria-label="POS Serial"
-            aria-describedby="basic-addon2"
+            placeholder="Serial"
+            aria-label="Serial"
+            aria-describedby="addBtn"
           />
-          <span class="input-group-text" id="basic-addon2">Serial</span>
         </div>
-        <div class="input-group mb-3">
-          <button
-            class="custom-btn cw-7rem clr-success shadow-sm"
-            type="button"
-            id="addBtn"
-          >
-            Add
-          </button>
-        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-6 col-md-4 col-sm-3">
+        <button
+          class="btn btn-sm btn-outline-inventory w-25"
+          type="button"
+          id="addBtn"
+        >
+          Add
+        </button>
       </div>
     </div>
   </div>
@@ -43,13 +48,18 @@
 <hr class="border border-2 opacity-50" />
 
 <div class="table-responsive">
-  <table id="datatable" class="table table-bordered table-hover">
+  <table
+    id="datatable"
+    class="table table-hover table-light table-bordered border-primary"
+  >
     <thead>
-      <th class="bg-secondary text-white">ID</th>
-      <th class="bg-secondary text-white">POS Name</th>
-      <th class="bg-secondary text-white">POS Serial</th>
-      <th class="bg-secondary text-white">Status</th>
-      <th class="bg-secondary text-white">Action</th>
+      <tr>
+        <th>ID</th>
+        <th>POS Name</th>
+        <th>Serial</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
     </thead>
     <tbody></tbody>
   </table>
@@ -69,7 +79,7 @@
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Edit POS</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Edit Categoty</h5>
       </div>
       <div class="modal-body">
         <div class="row mb-2">
@@ -77,7 +87,7 @@
             <div class="card-body">
               <div class="row mb-2">
                 <div class="col-md-12">
-                  <label class="form-label" for="idmodal">POS ID</label>
+                  <label class="form-label" for="idmodal">Category ID</label>
                   <input
                     autocomplete="off"
                     id="idmodal"
@@ -99,25 +109,24 @@
                     name="posnamemodal"
                     type="text"
                     class="form-control"
-                    placeholder="Enter new pos name"
+                    placeholder="Enter new POS name"
                     aria-label="fullname"
                     aria-describedby="basic-addon1"
                   />
                 </div>
               </div>
-
               <div class="row">
                 <div class="col-md-12">
-                  <label class="form-label" for="posserialmodal"
-                    >POS Serial</label
+                  <label class="form-label" for="serialmodal"
+                    >Serial Name</label
                   >
                   <input
                     autocomplete="off"
-                    id="posserialmodal"
-                    name="posserialmodal"
+                    id="serialmodal"
+                    name="serialmodal"
                     type="text"
                     class="form-control"
-                    placeholder="Enter new pos serial"
+                    placeholder="Enter new serial"
                     aria-label="fullname"
                     aria-describedby="basic-addon1"
                   />
@@ -138,7 +147,7 @@
         <button
           type="button"
           id="saveBtn"
-          class="custom-btn cw-7rem clr-success shadow-sm"
+          class="btn btn-sm btn-outline-inventory w-25"
         >
           <i class="fa fa-check" aria-hidden="true"></i> Save
         </button>

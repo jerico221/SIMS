@@ -1,0 +1,305 @@
+<script>
+  $(document).ready(function () {
+    let id = "";
+    let fullname = "";
+    let address = "";
+    let email = "";
+    let contactno = "";
+    let status = "";
+    LoadTable();
+
+    $("#datatable tbody").on("click", "tr", function () {
+      var dataRow = [];
+      $(this)
+        .closest("tr")
+        .find("td")
+        .each(function () {
+          dataRow.push($(this).text());
+        });
+      console.log(dataRow);
+      id = dataRow[0];
+      fullname = dataRow[1];
+      address = dataRow[2];
+      contactno = dataRow[3];
+      email = dataRow[4];
+      status = dataRow[5];
+    });
+
+    $(document).on("click", "#addBtn", function () {
+      let fullname = $("#fullname").val();
+      let contactno = $("#contactno").val();
+      let address = $("#address").val();
+      let email = $("#email").val();
+      let message = "";
+
+      if (fullname == "") {
+        message += "Fullfullname";
+      }
+      if (contactno == "") {
+        message += "Contact No";
+      }
+      if (email == "") {
+        message += "Email";
+      }
+      if (address == "") {
+        message += "Address";
+      }
+
+      if (message != "") {
+        warning("Required", message);
+      } else {
+        $.ajax({
+          type: "POST",
+          url: "/customer/save",
+          data: {
+            fullname: fullname,
+            contactno: contactno,
+            address: address,
+            email: email,
+          },
+          success: function (result) {
+            if (result.msg == "success") {
+              LoadTable();
+              success("Success", "New pos successfully added!");
+            }
+            if (result.msg == "exist") {
+              warning("Success", `${pos} is already exist!`);
+            }
+          },
+          error: function (error) {
+            warning("Error", error);
+          },
+        });
+      }
+    });
+
+    $(document).on("click", "#editBtn", function () {
+      $("#idmodal").val(id);
+      $("#editModal").modal("show");
+      $("#fullnamemodal").val(fullname);
+      $("#addressmodal").val(address);
+      $("#contactnomodal").val(contactno);
+      $("#emailmodal").val(email);
+      console.log(id);
+    });
+    //Edit Update
+    $(document).on("click", "#updateBtn", function () {
+      let fullnamemodal = $("#fullnamemodal").val();
+      let addressmodal = $("#addressmodal").val();
+      let emailmodal = $("#emailmodal").val();
+      let contactnomodal = $("#contactnomodal").val();
+
+      var message = "";
+
+      console.log(id);
+
+      if (fullnamemodal == "") {
+        message += "customer fullname ";
+      }
+      if (message != "") {
+        warning("Required", `Please fill up ${message}`);
+      } else {
+        $.ajax({
+          type: "PUT",
+          url: "/customer/edit",
+          data: {
+            fullname: fullnamemodal,
+            address: addressmodal,
+            email: emailmodal,
+            contactno: contactnomodal,
+            id: id,
+          },
+          success: function (result) {
+            if (result.msg == "success") {
+              LoadTable();
+              success("Saved", "Successfully");
+              $("#editModal").modal("hide");
+              $("#customerfullnamemodal").val("");
+            }
+
+            if (result.msg == "exist") {
+              warning("Exist", `${customernamemodal} already exist!`);
+            }
+          },
+          error: function (err) {
+            warning("Warning", err);
+          },
+        });
+      }
+    });
+
+    //Status Update
+    $(document).on("click", "#activeBtn", function () {
+      console.log(id);
+      console.log(status);
+      $.ajax({
+        type: "PUT",
+        url: "/customer/status",
+        data: {
+          status: status,
+          id: id,
+        },
+        success: function (result) {
+          if (result.msg == "success") {
+            LoadTable();
+            success("Update", "Status change successfully");
+          }
+
+          if (result.msg == "notexist") {
+            warning(`${id} does not exist!`);
+          }
+        },
+        error: function (err) {
+          warning("Warning", err);
+        },
+      });
+    });
+
+    $(document).on("click", "#inactiveBtn", function () {
+      console.log(id);
+      console.log(status);
+      $.ajax({
+        type: "PUT",
+        url: "/customer/status",
+        data: {
+          status: status,
+          id: id,
+        },
+        success: function (result) {
+          if (result.msg == "success") {
+            LoadTable();
+            success("Saved", "Status change successfully");
+          }
+
+          if (result.msg == "notexist") {
+            warning(`${id} does not exist!`);
+          }
+        },
+        error: function (err) {
+          warning("Warning", err);
+        },
+      });
+    });
+
+    $(document).on("click", "#deletebutton", function () {
+      console.log(id);
+      console.log(status);
+      $.ajax({
+        type: "DELETE",
+        url: "/customer/delete",
+        data: {
+          id: id,
+        },
+        success: function (result) {
+          if (result.msg == "success") {
+            LoadTable();
+            success("Saved", "Delete successfully");
+          }
+
+          if (result.msg == "notexist") {
+            warning(`${id} does not exist!`);
+          }
+        },
+        error: function (err) {
+          warning("Warning", err);
+        },
+      });
+    });
+
+    function LoadTable() {
+      $.ajax({
+        url: "/customer/load",
+        method: "GET",
+        dataType: "json",
+        success: function (data) {
+          console.log(data);
+          if (data.msg === "success") {
+            populatedatatable(data.data);
+          } else {
+            console.error(data.msg);
+          }
+        },
+        error: function (error) {
+          console.error(error);
+        },
+      });
+    }
+
+    function populatedatatable(data) {
+      console.log(data);
+      const tableBody = $("#datatable tbody");
+      tableBody.empty();
+
+      if (data.length === 0) {
+        const tr = $("<tr>").append(
+          $("<td>", {
+            colspan: 7,
+            class: "text-center",
+            text: "No Data Matched",
+          })
+        );
+        tableBody.append(tr);
+      } else {
+        data.forEach((item) => {
+          let action = "";
+          if (item.status === "ACTIVE") {
+            action = `
+                                    <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+                                    <span class="editbutton" id="inactiveBtn"><i class="fas fa-eye-slash" style="color: rgb(99, 115, 129);"></i></span>
+                                    <span class="editbutton" id="deletebutton"><i class="fas fa-trash" style="color: rgb(99, 115, 129);"></i></span>`;
+          } else if (item.status === "INACTIVE") {
+            action = `
+                                    <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+                                    <span class="editbutton" id="activeBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>
+                                     <span class="editbutton" id="deletebutton"><i class="fas fa-trash" style="color: rgb(99, 115, 129);"></i></span>`;
+          }
+          const statusBackground = getStatusBackground(item.status);
+          const containerBackground = getContainerBackground(item.status);
+
+          const tr = $("<tr>").append(
+            $("<td>", {
+              text: item.id,
+              "data-label": "ID",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.fullname,
+              "data-label": "Fullname",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.address,
+              "data-label": "Address",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.contactno,
+              "data-label": "Contact No",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.email,
+              "data-label": "Email",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              class: "custom-mobile-align",
+              "data-label": "Status",
+            }).append(
+              $("<div>", { class: containerBackground }).append(
+                $("<span>", { text: item.status, class: statusBackground })
+              )
+            ),
+            $("<td>", {
+              html: action,
+              "data-label": "Action",
+              class: "actionWidth",
+            })
+          );
+
+          tableBody.append(tr);
+        });
+      }
+    }
+  });
+</script>

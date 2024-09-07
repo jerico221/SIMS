@@ -1,0 +1,142 @@
+<div class="card">
+  <div class="card-header">
+    <h6 class="card-title">Welcome to Nava's Kitchen</h6>
+  </div>
+  <div class="card-body">
+    <div
+      class="row justify-content-center product-grid"
+      id="productdisplay"
+    ></div>
+  </div>
+</div>
+
+<!-- Cart Modal -->
+
+<div
+  class="modal fade"
+  id="cartModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="cartModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cartModalLabel">Cart</h5>
+        <button
+          class="close"
+          type="button"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover" id="carttable">
+            <thead class="thead-dark">
+              <th>Item</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Total</th>
+              <th>Action</th>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          class="btn btn-success"
+          type="button"
+          id="checkoutBtn"
+          name="checkoutBtn"
+        >
+          Checkout
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Checkout with location -->
+
+<div
+  class="modal fade"
+  id="checkoutModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="checkoutModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="checkoutModalLabel">Payment & Location</h5>
+        <button
+          class="close"
+          type="button"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <Select id="payment" class="form-control">
+                <Option value="--">Select Payment</Option>
+                <Option value="Store Points">Store Points</Option>
+                <Option value="COD">Cash on Delivery</Option>
+              </Select>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-md-6">
+            <div class="input-group mb-3">
+              <input
+                type="text"
+                class="form-control"
+                id="location"
+                placeholder="Enter Location"
+                disabled
+              />
+              <div class="input-group-append">
+                <label class="input-group-text" for="location">Location</label>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="input-group mb-3">
+             
+              <input
+                type="text"
+                class="form-control"
+                id="address"
+                placeholder="Enter Address"
+                disabled
+              />
+              <div class="input-group-append">
+                <label class="input-group-text" for="address">Address</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="justify-content-center" id="map"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-success" type="button" id="backBtn">
+          Back to Cart
+        </button>
+        <button class="btn btn-success" type="button" id="proceedBtn">
+          Proceed to Checkout
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -18,7 +18,7 @@ const connection = mysql.createConnection({
   database: process.env._DATABASE,
 });
 
-// crypt.Encrypter("#Ebedaf19dd0d", (err, result) => {
+// crypt.Encrypter("oycohaxqhzruviop", (err, result) => {
 //   if (err) console.error("Error: ", err);
 
 //   console.log(result);
