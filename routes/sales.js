@@ -62,50 +62,91 @@ router.post("/save", (req, res) => {
       cashier
     );
 
-    let cmd = InsertStatement("sales", "s", [
-      "pos",
-      "details",
-      "total",
-      "paymenttype",
-      "cashreceive",
-      "change",
-      "status",
-      "date",
-      "cashier",
-    ]);
+    async function ProcessData() {
+      let cmd = InsertStatement("sales", "s", [
+        "pos",
+        "details",
+        "total",
+        "paymenttype",
+        "cashreceive",
+        "change",
+        "status",
+        "date",
+        "cashier",
+      ]);
 
-    let data = [
-      [
-        pos,
-        details,
-        total,
-        paymenttype,
-        cashreceive,
-        change,
-        status,
-        date,
-        cashier,
-      ],
-    ];
+      let data = [
+        [
+          pos,
+          details,
+          total,
+          paymenttype,
+          cashreceive,
+          change,
+          status,
+          date,
+          cashier,
+        ],
+      ];
 
-    for (const d of JSON.parse(details[0])) {
-      const {id, name, price, quantity} = d;
-      console.log(id, name, price, quantity);
-      
-    }
+      let detailjson = JSON.parse(details);
 
-    InsertTable(cmd, data, (error, result) => {
-      if (error) {
-        console.log(error);
-        return res.status(500).send({
-          msg: error,
-        });
+      for (const d of JSON.parse(detailjson)) {
+        const { id, name, price, quantity } = d;
+        console.log(id, name, price, quantity);
+
+        let sql_check = SelectStatement(
+          "select * from product where p_id = ?",
+          [id]
+        );
+
+        let response = await Check(sql_check);
+        let isiventory = response[0].p_isinventory;
+
+        if (isiventory != 0) {
+          console.log(name);
+          let sql_stock = SelectStatement(
+            "select i_stock from inventory where i_productid = ?",
+            [id]
+          );
+
+          let currentstock = await Check(sql_stock);
+
+          let newquantity = parseInt(currentstock[0].i_stock) - parseInt(quantity);
+
+          let sql_update = UpdateStatement(
+            "inventory",
+            "i",
+            ["stock"],
+            ["productid"]
+          );
+
+          Update(sql_update, [newquantity, id], (error, result) => {
+            if (error) {
+              console.error(error);
+              return res.status(500).send({ msg: error });
+            }
+
+            console.log(result);
+          });
+        }
       }
 
-      console.log(result);
+      InsertTable(cmd, data, (error, result) => {
+        if (error) {
+          console.log(error);
+          return res.status(500).send({
+            msg: error,
+          });
+        }
 
-      res.status(200).send({ msg: "success" });
-    });
+        console.log(result);
+
+        res.status(200).send({ msg: "success" });
+      });
+    }
+
+    ProcessData();
   } catch (error) {
     console.error(error);
     res.status(500).json({
