@@ -51,6 +51,9 @@ const roleacess = [
       {
         layout: "storepointshistorylayout",
       },
+      {
+        layout: "chatlayout",
+      },
     ],
     //#endregion
   },
@@ -163,7 +166,6 @@ exports.Validator = function (req, res, layout) {
       routes.forEach((value, index) => {
         if (key.role == req.session.access && value.layout == layout) {
           console.log(req.session.access, layout);
-
           return res.render(`${layout}`, {
             employeeid: req.session.employeeid,
             fullname: req.session.fullname,
