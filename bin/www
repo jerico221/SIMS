@@ -21,16 +21,16 @@ app.set("port", port);
 
 var server = http.createServer(app);
 
-var socketIo = require("socket.io");
-var io = socketIo(server);
+// var socketIo = require("socket.io");
+// var io = socketIo(server);
 
-io.on("connection", function (socket) {
-  let message = "test";
+// io.on("connection", function (socket) {
+//   let message = "test";
 
-  setInterval(() => {
-    socket.emit("agentchat", message);
-  }, 1000);
-});
+//   setInterval(() => {
+//     socket.emit("agentchat", message);
+//   }, 1000);
+// });
 
 /**
  * Listen on provided port, on all network interfaces.
