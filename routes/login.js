@@ -55,6 +55,7 @@ router.post("/login", (req, res) => {
     } else {
       console.log("hit here @");
       let sql = `select
+                e_id as u_id,
                 e_fullname as u_employeeid,
                 a_name as u_access
                 from user
@@ -70,6 +71,7 @@ router.post("/login", (req, res) => {
 
         if (result.length != 0) {
           let data = DataModeling(result, "u_");
+          req.session.agentid = data[0].id;
           req.session.employeeid = data[0].employeeid;
           req.session.access = data[0].access;
           return res.status(200).send({ msg: "success", data: data });

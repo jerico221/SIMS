@@ -188,6 +188,7 @@ exports.Validator = function (req, res, layout) {
             fullname: req.session.fullname,
             customerid: req.session.customerid,
             access: req.session.access,
+            agentid: req.session.agentid,
           });
         }
       });
