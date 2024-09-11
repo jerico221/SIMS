@@ -1,11 +1,25 @@
 <script>
   $(document).ready(function () {
+    document.addEventListener("keydown", function (event) {
+      if (event.keyCode == 13) {
+        let username = $("#username").val();
+        let password = $("#password").val();
+        console.log("Enter pressed");
+        Login(username, password);
+      }
+    });
+
     $(document).on("click", "#loginBtn", function () {
       let username = $("#username").val();
       let password = $("#password").val();
-      let message = "";
+
       console.log(username, password);
 
+      Login(username, password);
+    });
+
+    function Login(username, password) {
+      let message = "";
       if (username == "") {
         message += "Username ";
       }
@@ -25,15 +39,18 @@
           },
           success: function (result) {
             console.log(result.msg);
-            
+
             if (result.msg == "success") {
               location.replace("/");
             }
-            if(result.msg == 'customer'){
+            if (result.msg == "customer") {
               location.replace("/productdisplay");
             }
-            if(result.msg == 'inactive'){
-              warning("Not Active", "To activate account please check you email to verify your account");
+            if (result.msg == "inactive") {
+              warning(
+                "Not Active",
+                "To activate account please check you email to verify your account"
+              );
             }
             if (result.msg == "failed") {
               warning("Failed", "Username or password is incorrect!");
@@ -44,6 +61,6 @@
           },
         });
       }
-    });
+    }
   });
 </script>

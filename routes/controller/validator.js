@@ -70,6 +70,20 @@ const roleacess = [
     ],
     //#endregion
   },
+
+  {
+    //#region User
+    role: "Agents",
+    routes: [
+      {
+        layout: "indexlayout",
+      },
+      {
+        layout: "chatlayout",
+      },
+    ],
+    //#endregion
+  },
   {
     //#region Owner
     role: "Owner",
@@ -151,6 +165,9 @@ const roleacess = [
       },
       {
         layout: "customerorderhistorylayout",
+      },
+      {
+        layout: "customerchatlayout",
       },
     ],
     //#endregion

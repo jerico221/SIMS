@@ -57,9 +57,13 @@
 <!-- SWAL-->
 <script src="/javascripts/sweetalert.min.js"></script>
 
+<!-- SocketIO -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+
 <!-- Page level custom scripts
 <script src="/javascripts/js/demo/chart-area-demo.js"></script>
 <script src="/javascripts/js/demo/chart-pie-demo.js"></script> -->
+<%- include('chat.ejs') %>
 <script>
   function messagePrompt(title, text, icon) {
     return swal({
@@ -306,5 +310,10 @@
     var formattedValue = parseFloat(value).toFixed(2);
     return "₱" + formattedValue.replace(/\d(?=(\d{3})+\.)/g, "$&,");
   }
+  //#endregion
+
+  //#region Chat
+  
+
   //#endregion
 </script>

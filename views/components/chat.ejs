@@ -1,0 +1,10 @@
+<script>
+  $(document).ready(function () {
+    const userid = "<%= employeeid %>";
+    const socket = io();
+
+    socket.on("agentchat", (data) => {
+    //   console.log(data);
+    });
+  });
+</script>

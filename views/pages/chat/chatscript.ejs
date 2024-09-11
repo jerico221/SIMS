@@ -1,7 +1,185 @@
 <script>
   $(document).ready(function () {
+    const userid = "<%= employeeid %>";
+    let customerid = "";
+    let agentid = "";
+    let customername = "";
+    LoadCustomer();
+
+    document.addEventListener("keydown", function (event) {
+      if (event.keyCode == 13) {
+        let message = $("#message").val();
+        SendMessage(message);
+      }
+    });
+
+    $(document).on("click", "#sendBtn", function () {
+      let message = $("#message").val();
+      SendMessage(message);
+    });
+
+    function SendMessage(message) {
+      if (message == "") {
+      } else {
+        $.ajax({
+          type: "POST",
+          url: "/customerchat/send",
+          data: {
+            customerid: customerid,
+            userid: agentid,
+            message: message,
+            senderstatus: "agent",
+          },
+          success: function (data) {
+            console.log(data);
+            $("#message").val("");
+            CustomerChat(customerid, userid, customername);
+            StartChatListening(customerid, userid, customername);
+          },
+          error: function (error) {
+            console.log(error);
+          },
+        });
+      }
+    }
+
     $("#action_menu_btn").click(function () {
       $(".action_menu").toggle();
     });
+
+    $(document).on("click", ".customer", function () {
+      let keyid = $(this).attr("id");
+      let keys = keyid.split("_");
+      let id = keys[0];
+      customername = keys[1];
+
+      console.log(id, userid, customername);
+
+      CustomerChat(id, userid, customername);
+    });
+
+    function StartChatListening(customerid, userid, customername) {
+      setInterval(() => {
+        CustomerChat(customerid, userid, customername);
+      }, 500);
+    }
+
+    function CustomerChat(id, userid, customername) {
+      $.ajax({
+        type: "POST",
+        url: "/chat/customerchat",
+        data: {
+          customerid: id,
+          userid: userid,
+        },
+        success: function (data) {
+          let customerchats = data.data;
+
+          $("#customername").html(``);
+
+          $("#customername").append(`
+           <div class="d-flex bd-highlight">
+            <div class="img_cont">
+              <img
+                src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg"
+                class="rounded-circle user_img"
+              />
+              <span class="online_icon"></span>
+            </div>
+          <div class="user_info">
+            <span>${customername}</span>
+          </div>
+          </div>
+        <span id="action_menu_btn"><i class="fas fa-ellipsis-v"></i></span>
+        <div class="action_menu">
+          <ul>
+            <li><i class="fas fa-user-circle"></i> View profile</li>
+            <li><i class="fas fa-users"></i> Add to close friends</li>
+            <li><i class="fas fa-plus"></i> Add to group</li>
+            <li><i class="fas fa-ban"></i> Block</li>
+          </ul>
+        </div>`);
+
+          $("#chatcontent").html("");
+          customerchats.forEach((key, item) => {
+            agentid = key.userid;
+            customerid = key.customerid;
+
+            if (key.status == "customer") {
+              $("#chatcontent").append(`
+           <div class="d-flex justify-content-start mb-4">
+              <div class="img_cont_msg">
+                <img
+                  src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg"
+                  class="rounded-circle user_img_msg"
+                />
+              </div>
+              <div class="msg_cotainer">
+              ${key.message}
+                <span class="msg_time">${key.date}</span>
+              </div>
+            </div>
+          `);
+            } else {
+              $("#chatcontent").append(` 
+                <div class="d-flex justify-content-end mb-4">
+                <div class="msg_cotainer_send">
+                  ${key.message}
+                <span class="msg_time">${key.date}</span>
+                </div>
+
+                <div class="img_cont_msg">
+                  <img
+                  src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg"
+                  class="rounded-circle user_img_msg"/>
+                </div>`);
+            }
+
+            $("#chatcontent").scrollTop($("#chatcontent")[0].scrollHeight);
+          });
+        },
+
+        error: function (error) {
+          console.log(error);
+        },
+      });
+    }
+    function LoadCustomer() {
+      $.ajax({
+        type: "get",
+        url: "/chat/customer",
+        success: function (data) {
+          console.log(data);
+          let customers = data.data;
+          $("#customers").html("");
+
+          if (customers.length != 0) {
+            customers.forEach((key, item) => {
+              console.log(key);
+
+              $("#customers").append(`
+              <li class="active customer" id="${key.id}_${key.fullname}" name="${key.id}_${key.fullname}">
+                <div class="d-flex bd-highlight">
+                  <div class="img_cont">
+                    <img
+                      src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg"
+                      class="rounded-circle user_img"
+                    />
+                    <span class="online_icon"></span>
+                  </div>
+                  <div class="user_info">
+                    <span>${key.fullname}</span>
+                  
+                  </div>
+                </div>
+              </li>`);
+            });
+          }
+        },
+        error: function (error) {
+          console.log(error);
+        },
+      });
+    }
   });
 </script>
