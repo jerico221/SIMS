@@ -51,12 +51,29 @@ const roleacess = [
       {
         layout: "storepointshistorylayout",
       },
+      {
+        layout: "chatlayout",
+      },
     ],
     //#endregion
   },
   {
     //#region User
     role: "User",
+    routes: [
+      {
+        layout: "indexlayout",
+      },
+      {
+        layout: "chatlayout",
+      },
+    ],
+    //#endregion
+  },
+
+  {
+    //#region User
+    role: "Agents",
     routes: [
       {
         layout: "indexlayout",
@@ -149,6 +166,9 @@ const roleacess = [
       {
         layout: "customerorderhistorylayout",
       },
+      {
+        layout: "customerchatlayout",
+      },
     ],
     //#endregion
   },
@@ -163,7 +183,6 @@ exports.Validator = function (req, res, layout) {
       routes.forEach((value, index) => {
         if (key.role == req.session.access && value.layout == layout) {
           console.log(req.session.access, layout);
-
           return res.render(`${layout}`, {
             employeeid: req.session.employeeid,
             fullname: req.session.fullname,

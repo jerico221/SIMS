@@ -1,0 +1,129 @@
+<script>
+  $(document).ready(function () {
+    let customerid = "<%= customerid %>";
+    let userid = "";
+    LoadAgent();
+
+    document.addEventListener("keydown", function (event) {
+      if (event.keyCode == 13) {
+        let message = $("#message").val();
+        SendMessage(message);
+      }
+    });
+
+    $(document).on("click", "#sendBtn", function () {
+      let message = $("#message").val();
+      SendMessage(message);
+    });
+
+    function SendMessage(message) {
+      if (message == "") {
+      } else {
+        $.ajax({
+          type: "POST",
+          url: "/customerchat/send",
+          data: {
+            customerid: customerid,
+            userid: userid,
+            message: message,
+            senderstatus: "customer",
+          },
+          success: function (data) {
+            console.log(data);
+            $("#message").val("");
+            LoadChat();
+            StartChatListening();
+          },
+          error: function (error) {
+            console.log(error);
+          },
+        });
+      }
+    }
+
+    function StartChatListening() {
+      setInterval(() => {
+        LoadChat();
+      }, 500);
+    }
+    function LoadChat() {
+      $.ajax({
+        type: "POST",
+        url: "/customerchat/chat",
+        data: {
+          customerid: customerid,
+          userid: userid,
+        },
+        success: function (data) {
+          console.log(data);
+          let chat = data.data;
+          $("#chat").html("");
+
+          if (chat.length != 0) {
+            chat.forEach((key, item) => {
+              if (key.status == "agent") {
+                $("#chat").append(`
+           <div class="d-flex justify-content-start mb-4">
+              <div class="img_cont_msg">
+                <img
+                  src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg"
+                  class="rounded-circle user_img_msg"
+                />
+              </div>
+              <div class="msg_cotainer">
+              ${key.message}
+                <span class="msg_time">${key.date}</span>
+              </div>
+            </div>
+          `);
+              } else {
+                $("#chat").append(` 
+                <div class="d-flex justify-content-end mb-4">
+                <div class="msg_cotainer_send">
+                  ${key.message}
+                <span class="msg_time">${key.date}</span>
+                </div>
+
+                <div class="img_cont_msg">
+                  <img
+                  src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg"
+                  class="rounded-circle user_img_msg"/>
+                </div>`);
+              }
+            });
+
+            $("#chat").scrollTop($("#chat")[0].scrollHeight);
+          } else {
+            $("#chat").append(`No Chat Available`);
+          }
+        },
+        error: function (error) {
+          console.log(error);
+        },
+      });
+    }
+    function LoadAgent() {
+      $.ajax({
+        type: "GET",
+        url: "/customerchat/getagent",
+        success: function (data) {
+          console.log(data);
+          let agents = data.data;
+          //   $("#agents").html("");
+
+          agents.forEach((key, item) => {
+            console.log(key.fullname);
+            userid = key.userid;
+
+            $("#agents").append(`<span>${key.fullname}</span>`);
+          });
+
+          LoadChat();
+        },
+        error: function (error) {
+          console.log(error);
+        },
+      });
+    }
+  });
+</script>

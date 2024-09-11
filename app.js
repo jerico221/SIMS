@@ -28,6 +28,8 @@ var customerorderhistoryRouter = require("./routes/customerorderhistory");
 var storepointhistoryRouter = require("./routes/storepointhistory");
 var customerstorepointsRouter = require("./routes/customerstorepoints");
 var verificationRouter = require("./routes/verification");
+var chatRouter = require("./routes/chat");
+var customerchatRouter = require("./routes/customerchat");
 
 const { SetMongo } = require("./routes/controller/mongodb");
 
@@ -75,8 +77,9 @@ app.use("/customerorder", customerorderRouter);
 app.use("/customerorderhistory", customerorderhistoryRouter);
 app.use("/storepointhistory", storepointhistoryRouter);
 app.use("/customerstorepoints", customerstorepointsRouter);
-app.use('/verification', verificationRouter);
-
+app.use("/verification", verificationRouter);
+app.use("/chat", chatRouter);
+app.use("/customerchat", customerchatRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
