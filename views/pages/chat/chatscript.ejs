@@ -1,10 +1,12 @@
 <script>
   $(document).ready(function () {
     const userid = "<%= employeeid %>";
-    let customerid = "";
-    let agentid = "";
-    let customername = "";
+    var customerid = "";
+    var agentid = "";
+    var customername = "";
+    var intervalid;
     LoadCustomer();
+    // StartChatListening(id, userid, customername);
 
     document.addEventListener("keydown", function (event) {
       if (event.keyCode == 13) {
@@ -34,7 +36,6 @@
             console.log(data);
             $("#message").val("");
             CustomerChat(customerid, userid, customername);
-            StartChatListening(customerid, userid, customername);
           },
           error: function (error) {
             console.log(error);
@@ -56,11 +57,18 @@
       console.log(id, userid, customername);
 
       CustomerChat(id, userid, customername);
+
+      StartChatListening(id, userid, customername);
     });
 
-    function StartChatListening(customerid, userid, customername) {
-      setInterval(() => {
-        CustomerChat(customerid, userid, customername);
+    function StartChatListening(id, userid, customername) {
+      clearInterval(intervalid);
+      intervalid = setInterval(() => {
+        console.log(id);
+
+        if (id != "") {
+          CustomerChat(id, userid, customername);
+        }
       }, 500);
     }
 
