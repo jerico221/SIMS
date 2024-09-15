@@ -4,6 +4,8 @@
     let userid = "";
     LoadAgent();
 
+    StartChatListening();
+
     document.addEventListener("keydown", function (event) {
       if (event.keyCode == 13) {
         let message = $("#message").val();
@@ -32,7 +34,6 @@
             console.log(data);
             $("#message").val("");
             LoadChat();
-            StartChatListening();
           },
           error: function (error) {
             console.log(error);
