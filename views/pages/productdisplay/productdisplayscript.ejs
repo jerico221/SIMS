@@ -1,9 +1,11 @@
 <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
 <script>
   $(document).ready(function () {
+    let customerid = "<%= customerid %>";
     let cart = [];
     let details = [];
     var itemcart = 0;
+    let total = 0;
     LoadProductDisplay();
 
     let row_index = "";
@@ -128,6 +130,10 @@
       itemcart += 1;
 
       $("#counter").text(itemcart);
+
+      //Update Total
+      total += current_price;
+      $("#total").html(formatCurrency(total));
     });
 
     $(document).on("click", ".btnminus", function (e) {
@@ -202,6 +208,10 @@
 
       itemcart -= 1;
       $("#counter").text(itemcart);
+
+      //Update Total
+      total -= current_price;
+      $("#total").html(formatCurrency(total));
     });
 
     $(document).on("click", ".btnremove", function (e) {
@@ -228,6 +238,7 @@
 
       const tableBody = $("#carttable tbody");
       tableBody.empty();
+      total = 0;
 
       cart.forEach((item) => {
         let action = `
@@ -266,8 +277,22 @@
           })
         );
 
+        total += item.price * item.quantity;
+
         tableBody.append(tr);
       });
+
+      $("#total").html(formatCurrency(total));
+    });
+
+    $(document).on("change", "#payment", function (e) {
+      let value = this.value;
+
+      if (value == "Store Points") {
+        $("#pointsdisplay").removeAttr("hidden");
+      } else {
+        $("#pointsdisplay").attr("hidden", true);
+      }
     });
 
     $("#checkoutBtn").click(function () {
@@ -277,7 +302,8 @@
         $("#map").html(
           '<div class="row justify-content-center"><p>Please wait while map is rendering...</p></div>'
         );
-        setTimeout(initMap, 3000);
+        setTimeout(initMap, 10000);
+        $("#totalcheckout").html(formatCurrency(total));
         $("#cartModal").modal("hide");
         $("#checkoutModal").modal("show");
       }
@@ -292,6 +318,8 @@
       let location = $("#location").val();
       let address = $("#address").val();
       let payment = $("#payment").val();
+      let points = $("#points").val();
+      let storepoints = parseFloat(RemoveCurrencyFormatting(points));
       let message = "";
 
       if (location == "") {
@@ -304,6 +332,12 @@
         message += "Payment ";
       }
 
+      if (payment == "Store Points") {
+        if (storepoints < total) {
+          message += "Insufficient Points";
+        }
+      }
+
       if (message != "") {
         warning("Required", `${message} is required!`);
       } else {
@@ -313,6 +347,7 @@
             address: address,
             payment: payment,
             cart: details,
+            total: total,
           },
         ];
         $.ajax({
@@ -321,15 +356,24 @@
           data: {
             details: JSON.stringify(data),
             paymentmethod: payment,
+            customerid: customerid,
+            storepoints: storepoints,
           },
           success: function (result) {
             if (result.msg == "success") {
               cart = [];
+              details = [];
               itemcart = 0;
+              total = 0;
+              $("#counter").text(itemcart);
               $("#checkoutModal").modal("hide");
               success("Success", "New order successfully added!");
+
+              setTimeout(() => {
+                window.location.replace("/productdisplay");
+              }, 3000);
             } else if (result.msg == "exist") {
-              warning("Success", `There is an existing order!`);
+              warning("Warning", `There is an existing order!`);
             }
           },
           error: function (error) {
@@ -427,6 +471,22 @@
                   </div>
   `;
             $("#productdisplay").append(res);
+          });
+        },
+        error: function (error) {
+          console.log(error);
+        },
+      });
+
+      $.ajax({
+        url: "/customer/getstorepoints/<%= customerid%>",
+        type: "GET",
+        success: function (data) {
+          let result = data.data;
+
+          result.forEach((item) => {
+            $("#storepoints").html(formatCurrency(item.points));
+            $("#points").val(item.points);
           });
         },
         error: function (error) {

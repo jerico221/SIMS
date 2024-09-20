@@ -112,7 +112,8 @@ router.post("/save", (req, res) => {
 
           let currentstock = await Check(sql_stock);
 
-          let newquantity = parseInt(currentstock[0].i_stock) - parseInt(quantity);
+          let newquantity =
+            parseInt(currentstock[0].i_stock) - parseInt(quantity);
 
           let sql_update = UpdateStatement(
             "inventory",
@@ -152,5 +153,39 @@ router.post("/save", (req, res) => {
     res.status(500).json({
       msg: error,
     });
+  }
+});
+
+router.post("/getdetails", (req, res) => {
+  try {
+    const { id } = req.body;
+    let sql = SelectStatement("select * from sales where s_id = ?", [id]);
+    Select(sql, (error, result) => {
+      if (error) {
+        console.error(error);
+
+        return res.status(500).send({ msg: error });
+      }
+
+      let data = DataModeling(result, "s_");
+      let dataJson = JSON.parse(data[0].details);
+      let arrayJson = JSON.parse(dataJson);
+      let resultJson = [];
+
+      arrayJson.forEach((key, item) => {
+        const { id, name, price, quantity } = key;
+        console.log(id, name, price, quantity);
+        resultJson.push({
+          id: id,
+          name: name,
+          price: price,
+          quantity: quantity,
+        });
+      });
+
+      res.status(200).send({ msg: "success", data: resultJson });
+    });
+  } catch (error) {
+    res.status(500).send({ msg: error });
   }
 });

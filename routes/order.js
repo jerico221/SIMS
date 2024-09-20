@@ -24,7 +24,7 @@ module.exports = router;
 
 router.get("/load", (req, res) => {
   try {
-    let cmd = "select * from sims.order";
+    let cmd = "select * from sims.order order by o_date desc";
 
     Select(cmd, (error, result) => {
       if (error) {
@@ -49,9 +49,8 @@ router.get("/load", (req, res) => {
 
 router.post("/save", (req, res) => {
   try {
-    const { details, paymentmethod } = req.body;
+    const { details, paymentmethod, customerid, storepoints } = req.body;
     let status = StatusMessage.PND;
-    let customerid = req.session.customerid;
     let date = GetCurrentDatetime();
 
     let cmd = InsertStatement("sims.order", "o", [
@@ -105,6 +104,28 @@ router.post("/save", (req, res) => {
               });
             }
           });
+
+          if (paymentmethod == "Store Points") {
+            for (const detail of JSON.parse(details)) {
+              const { location, address, payment, cart, total } = detail;
+              console.log("Total:", total);
+
+              let sql = UpdateStatement(
+                "customer_store_points",
+                "csp",
+                ["points"],
+                ["id"]
+              );
+              let current_balance = parseFloat(storepoints) - total;
+              let customer_store_points = [current_balance, customerid];
+              console.log(sql);
+
+              Update(sql, customer_store_points, (err, result) => {
+                if (err) console.error("Error: ", err);
+                console.log(result);
+              });
+            }
+          }
 
           res.status(200).send({ msg: "success" });
         });

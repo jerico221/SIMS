@@ -25,7 +25,7 @@ router.post("/login", (req, res) => {
     if (username.includes("@")) {
       console.log("hit here @");
 
-      let sql = "select * from customer where c_email = ? and c_password = ?";
+      let sql = `select c_id, c_fullname, c_contactno, c_email, csp_points as c_storepoints from customer inner join customer_store_points where c_email = ? and c_password = ?`;
       let cmd = SelectStatement(sql, [username, EncryptString(password)]);
       Select(cmd, (error, result) => {
         if (error) {
@@ -39,7 +39,8 @@ router.post("/login", (req, res) => {
           let data = DataModeling(result, "c_");
           req.session.fullname = data[0].fullname;
           req.session.customerid = data[0].id;
-          req.session.access = "customer";
+          req.session.access = "customer"
+          req.session.storepoints =  parseFloat(data[0].storepoints).toFixed(2);
 
           console.log(data[0].status);
 
