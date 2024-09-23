@@ -115,7 +115,7 @@ router.post("/register", (req, res) => {
                 </br> 
                 <h1>${randomNumber}</h1>
                 </br>
-                <a href="http://localhost:3000/verification/verify?id=${customerid}">Click here to verify</a>`
+                <a href="${process.env._BASE_URL}/verification/verify?id=${customerid}">Click here to verify</a>`
               );
             }
           );

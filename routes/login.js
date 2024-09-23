@@ -39,8 +39,8 @@ router.post("/login", (req, res) => {
           let data = DataModeling(result, "c_");
           req.session.fullname = data[0].fullname;
           req.session.customerid = data[0].id;
-          req.session.access = "customer"
-          req.session.storepoints =  parseFloat(data[0].storepoints).toFixed(2);
+          req.session.access = "customer";
+          req.session.storepoints = parseFloat(data[0].storepoints).toFixed(2);
 
           console.log(data[0].status);
 
@@ -120,4 +120,29 @@ router.get("/logout", (req, res) => {
     }
     res.status(200).send({ msg: "success" });
   });
+});
+
+router.post("/logincustomer", (req, res) => {
+  try {
+    const { username, password } = req.body;
+    let sql = SelectStatement(
+      "select * from customer where c_email = ? and c_password = ?",
+      [username, EncryptString(password)]
+    );
+    Select(sql, (error, result) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).send({ msg: error });
+      }
+
+      if (result.length != 0) {
+        let data = DataModeling(result, "c_");
+        return res.status(200).send({ msg: "success", data: data });
+      } else {
+        return res.status(200).send({ msg: "failed", data: result });
+      }
+    });
+  } catch (error) {
+    res.status(500).send({ msg: error });
+  }
 });

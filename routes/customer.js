@@ -190,7 +190,6 @@ router.get("/getstorepoints/:id", (req, res) => {
     let sql = `select * from customer_store_points where csp_id=?`;
 
     console.log(id);
-    
 
     let cmd = SelectStatement(sql, [id]);
 
@@ -203,9 +202,36 @@ router.get("/getstorepoints/:id", (req, res) => {
       console.log(result);
       let data = DataModeling(result, "csp_");
 
-      res.status(200).send({ msg: 'success', data: data });
+      res.status(200).send({ msg: "success", data: data });
     });
   } catch (error) {
     res.status(500).send({ msg: error });
   }
 });
+
+router.get("/getcustomerinfo/:id",(req,res)=>{
+  try {
+    const { id } = req.params;
+    let sql = "select * from customer where c_id=?";
+
+    console.log(id);
+
+    let cmd = SelectStatement(sql, [id]);
+
+    Select(cmd, (error, result) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).send({ msg: error });
+      }
+
+      if (result.length != 0) {
+        let data = DataModeling(result, "c_");
+        return res.status(200).send({ msg: "success", data: data });
+      } else {
+        return res.status(200).send({ msg: "success", data: result });
+      }
+    });
+  } catch (error) {
+    res.status(500).send({ msg: error });
+  }
+})
