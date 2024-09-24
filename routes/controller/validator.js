@@ -65,14 +65,14 @@ const roleacess = [
         layout: "indexlayout",
       },
       {
-        layout: "chatlayout",
+        layout: "orderlayout",
       },
     ],
     //#endregion
   },
 
   {
-    //#region User
+    //#region Agents
     role: "Agents",
     routes: [
       {

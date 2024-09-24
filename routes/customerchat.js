@@ -103,11 +103,13 @@ router.post("/send", (req, res) => {
         res.status(500).send({
           msg: err,
         });
-      } else {
-        res.status(200).send({
-          msg: "success",
-        });
       }
+
+      console.log(data);
+
+      res.status(200).send({
+        msg: "success",
+      });
     });
   } catch (error) {
     res.status(500).send({
