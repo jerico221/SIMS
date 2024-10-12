@@ -82,40 +82,80 @@ router.put("/edit", (req, res) => {
   try {
     const { id, points } = req.body;
     let date = GetCurrentDatetime();
-    let data = [points, id];
 
-    let updateStatement = UpdateStatement(
-      "customer_store_points",
-      "csp",
-      ["points"],
-      ["id"]
+    let sql_check = SelectStatement(
+      "select csp_points from customer_store_points where csp_id=?",
+      [id]
     );
+    Check(sql_check).then((result) => {
+      let current_points = result[0].csp_points;
+      let new_points = current_points + parseFloat(points);
+      data = [new_points, id];
 
-    Update(updateStatement, data, (err, result) => {
-      if (err) console.error("Error: ", err);
+      let updateStatement = UpdateStatement(
+        "customer_store_points",
+        "csp",
+        ["points"],
+        ["id"]
+      );
 
-      console.log(result);
-
-      let history = InsertStatement("store_points_history", "sph", [
-        "storepointid",
-        "date",
-        "amount",
-        "activity",
-      ]);
-
-      let history_data = [[id, date, points, "Points Added"]];
-
-      InsertTable(history, history_data, (err, result) => {
+      Update(updateStatement, data, (err, result) => {
         if (err) console.error("Error: ", err);
-        console.log(result);
-      });
 
-      res.json({
-        msg: "success",
+        console.log(result);
+
+        let history = InsertStatement("store_points_history", "sph", [
+          "storepointid",
+          "date",
+          "amount",
+          "activity",
+        ]);
+
+        let history_data = [[id, date, points, "Points Added"]];
+
+        InsertTable(history, history_data, (err, result) => {
+          if (err) console.error("Error: ", err);
+          console.log(result);
+        });
+
+        res.json({
+          msg: "success",
+        });
       });
     });
   } catch (error) {
     console.log(error);
     res.json({ msg: error });
+  }
+});
+
+router.get("/getpointssummary/:id", (req, res) => {
+  try {
+    const { id } = req.params;
+    let sql = SelectStatement(
+      `select 
+      sph_date as date,
+      sph_amount as amount,
+      sph_activity as activity
+      from customer_store_points
+      inner join store_points_history on csp_id = sph_storepointid
+      where csp_customerid = ?`,
+      [id]
+    );
+
+    Select(sql, (err, result) => {
+      if (err) {
+        res.status(500).send({
+          msg: err,
+        });
+      } else {
+        res.status(200).send({
+          msg: "success",
+          data: result,
+        });
+      }
+    });
+  } catch (error) {
+    res.status(500).send({ msg: error });
   }
 });
