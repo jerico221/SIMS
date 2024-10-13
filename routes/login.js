@@ -136,7 +136,8 @@ router.post("/logincustomer", (req, res) => {
         c_password,
         csp_points as c_points 
         from customer
-        inner join customer_store_points on c_id = csp_customerid;where c_email = ? and c_password = ?`,
+        inner join customer_store_points on c_id = csp_customerid 
+        where c_email = ? and c_password = ?`,
       [username, EncryptString(password)]
     );
     Select(sql, (error, result) => {
