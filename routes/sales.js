@@ -52,15 +52,15 @@ router.post("/save", (req, res) => {
     let status = StatusMessage.SLD;
     let date = GetCurrentDatetime();
 
-    console.log(
-      pos,
-      JSON.stringify(details),
-      total,
-      paymenttype,
-      cashreceive,
-      change,
-      cashier
-    );
+    // console.log(
+    //   pos,
+    //   JSON.stringify(details),
+    //   total,
+    //   paymenttype,
+    //   cashreceive,
+    //   change,
+    //   cashier
+    // );
 
     async function ProcessData() {
       let cmd = InsertStatement("sales", "s", [
