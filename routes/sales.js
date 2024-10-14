@@ -106,14 +106,14 @@ router.post("/save", (req, res) => {
         if (isiventory != 0) {
           console.log(name);
           let sql_stock = SelectStatement(
-            "select i_stock from inventory where i_productid = ?",
+            "select i_stock as stock from inventory where i_productid = ?",
             [id]
           );
 
           let currentstock = await Check(sql_stock);
 
           let newquantity =
-            parseInt(currentstock[0].i_stock) - parseInt(quantity);
+            parseInt(currentstock[0].stock) - parseInt(quantity);
 
           let sql_update = UpdateStatement(
             "inventory",
