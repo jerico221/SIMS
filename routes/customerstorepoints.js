@@ -139,6 +139,35 @@ router.get("/getpointssummary/:id", (req, res) => {
       sph_activity as activity
       from customer_store_points
       inner join store_points_history on csp_id = sph_storepointid
+      where csp_customerid = ?
+      order by sph_id desc`,
+      [id]
+    );
+
+    Select(sql, (err, result) => {
+      if (err) {
+        res.status(500).send({
+          msg: err,
+        });
+      } else {
+        res.status(200).send({
+          msg: "success",
+          data: result,
+        });
+      }
+    });
+  } catch (error) {
+    res.status(500).send({ msg: error });
+  }
+});
+
+router.get("/getcurrentbalance/:id", (req, res) => {
+  try {
+    const { id } = req.params;
+    let sql = SelectStatement(
+      `select 
+      csp_points as points
+      from customer_store_points
       where csp_customerid = ?`,
       [id]
     );

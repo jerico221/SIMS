@@ -11,7 +11,7 @@
     function getSalesDetails() {
       Fetch("/getdailysales", function (result) {
         if (result.msg === "success") {
-          $("#sales-today").html(result.data.total);
+          $("#sales-today").html(formatCurrency(result.data.total));
         } else {
           console.error(result.msg);
         }
@@ -19,7 +19,7 @@
 
       Fetch("/getmothlysales", function (result) {
         if (result.msg === "success") {
-          $("#sales-monthly").html(result.data.total);
+          $("#sales-monthly").html(formatCurrency(result.data.total));
         } else {
           console.error(result.msg);
         }

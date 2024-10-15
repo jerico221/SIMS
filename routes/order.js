@@ -53,6 +53,8 @@ router.post("/save", (req, res) => {
     let status = StatusMessage.PND;
     let date = GetCurrentDatetime();
 
+    console.log(storepoints);
+
     let cmd = InsertStatement("sims.order", "o", [
       "date",
       "customerid",
@@ -117,10 +119,28 @@ router.post("/save", (req, res) => {
                 ["id"]
               );
               let current_balance = parseFloat(storepoints) - total;
+              console.log(current_balance, storepoints);
+
               let customer_store_points = [current_balance, customerid];
               console.log(sql);
 
               Update(sql, customer_store_points, (err, result) => {
+                if (err) console.error("Error: ", err);
+                console.log(result);
+              });
+
+              let history = InsertStatement("store_points_history", "sph", [
+                "storepointid",
+                "date",
+                "amount",
+                "activity",
+              ]);
+
+              let history_data = [
+                [customerid, GetCurrentDatetime(), storepoints, "Points Deducted"],
+              ];
+
+              InsertTable(history, history_data, (err, result) => {
                 if (err) console.error("Error: ", err);
                 console.log(result);
               });
