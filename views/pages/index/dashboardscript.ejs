@@ -1,0 +1,45 @@
+<script>
+  $(document).ready(function () {
+    let spinner = `<span id="btnSpinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`;
+    $("#sales-today").html(spinner);
+    $("#sales-monthly").html(spinner);
+    $("#orders-today").html(spinner);
+    $("#customer-monthly").html(spinner);
+
+    getSalesDetails();
+
+    function getSalesDetails() {
+      Fetch("/getdailysales", function (result) {
+        if (result.msg === "success") {
+          $("#sales-today").html(result.data.total);
+        } else {
+          console.error(result.msg);
+        }
+      });
+
+      Fetch("/getmothlysales", function (result) {
+        if (result.msg === "success") {
+          $("#sales-monthly").html(result.data.total);
+        } else {
+          console.error(result.msg);
+        }
+      });
+
+      Fetch("/getorders", function (result) {
+        if (result.msg === "success") {
+          $("#orders-today").html(result.data.total);
+        } else {
+          console.error(result.msg);
+        }
+      });
+
+      Fetch("/getnewusers", function (result) {
+        if (result.msg === "success") {
+          $("#customer-monthly").html(result.data.total);
+        } else {
+          console.error(result.msg);
+        }
+      });
+    }
+  });
+</script>
