@@ -3,6 +3,8 @@
 @import url(components.css);
 @import url(loading.css);
 @import url(webview-cards.css);
+@import url(chat.css);
+@import url(sb-admin-2.css);
 
 :root {
   --clr-font-white: #fff;
@@ -11,7 +13,7 @@
   --clr-icons: #E8E8E8;
   --clr-cardheader-bg: #ffffff;
   --clr-tableheader-bg: #584c4c;
-  --clr-sidebar-bg: rgb(42, 83, 92);
+  --clr-sidebar-bg: rgb(92, 42, 88);
 
   --clr-body-bg: rgb(255, 255, 255);
 
@@ -21,10 +23,10 @@
   --clr-3: #e4e4e4;
   --clr-4: #FFF6E0;
   --clr-5: #313638;
-  --clr-6: #34B1AA;
+  --clr-6: #349eb1;
   --clr-7: #d82a27;
   --clr-8: #992d3e;
-  --clr-btn: #34B1AA;
+  --clr-btn: #34b1b1;
   --clr-9: #ffb2bd;
   --clr-10: #ffffff;
   --clr-11: #445069;
@@ -215,7 +217,7 @@
 }
 
 .custom-bg {
-  background-color: var(--clr-sidebar-bg);
+  background-color: var(--clr-sidebar-bg) !important;
 }
 
 .scrollable-dashboard-table-container {
@@ -326,7 +328,7 @@ a {
 }
 
 .sidebar-bg {
-  background: linear-gradient(to bottom, #2e4044, #34B1AA) !important;
+  background: linear-gradient(to bottom, #2e4442, #34a9b1) !important;
   background-size: cover;
 }
 
@@ -764,9 +766,9 @@ td {
   }
 
   .navbar {
-    margin-left: 6.7rem;
+    margin-left: 6.7rem !important;
     width: var(--minus-6rem) !important;
-    border-bottom: solid 4px var(--clr-gradient-sidebar);
+    border-bottom: solid 4px var(--clr-gradient-sidebar)!important;
   }
 
   .content-toggled {
