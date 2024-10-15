@@ -22,7 +22,7 @@ module.exports = router;
 
 router.get("/load", (req, res) => {
   try {
-    let cmd = "select * from sales";
+    let cmd = "select * from sales order by s_id desc";
 
     Select(cmd, (error, result) => {
       if (error) {
@@ -159,6 +159,40 @@ router.post("/save", (req, res) => {
 router.post("/getdetails", (req, res) => {
   try {
     const { id } = req.body;
+    let sql = SelectStatement("select * from sales where s_id = ?", [id]);
+    Select(sql, (error, result) => {
+      if (error) {
+        console.error(error);
+
+        return res.status(500).send({ msg: error });
+      }
+
+      let data = DataModeling(result, "s_");
+      let dataJson = JSON.parse(data[0].details);
+      let arrayJson = JSON.parse(dataJson);
+      let resultJson = [];
+
+      arrayJson.forEach((key, item) => {
+        const { id, name, price, quantity } = key;
+        console.log(id, name, price, quantity);
+        resultJson.push({
+          id: id,
+          name: name,
+          price: price,
+          quantity: quantity,
+        });
+      });
+
+      res.status(200).send({ msg: "success", data: resultJson });
+    });
+  } catch (error) {
+    res.status(500).send({ msg: error });
+  }
+});
+
+router.get("/getdetails/:id", (req, res) => {
+  try {
+    const { id } = req.params;
     let sql = SelectStatement("select * from sales where s_id = ?", [id]);
     Select(sql, (error, result) => {
       if (error) {
