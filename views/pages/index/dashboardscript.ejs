@@ -18,6 +18,18 @@
       tbody.append(loader_orders);
     }
 
+    const loader_top = `  
+              <tr id="loading-state">
+                  <td><div class="custom-loader"></div></td>
+                  <td><div class="custom-loader"></div></td>
+                  <td><div class="custom-loader"></div></td>
+              </tr>`;
+
+    const tbody_top = $("#datatable-orders tbody");
+    for (let i = 0; i < 12; i++) {
+      tbody_top.append(loader_top);
+    }
+
     getSalesDetails();
 
     function getSalesDetails() {
