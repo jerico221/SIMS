@@ -5,6 +5,7 @@ const {
   Check,
   UpdateStatement,
   GetCurrentDatetime,
+  GetCurrentDate,
 } = require("./repository/helper");
 const { StatusMessage } = require("./repository/disctionary");
 const { Select, InsertTable, Update } = require("./repository/dbconnect");
@@ -22,7 +23,10 @@ module.exports = router;
 
 router.get("/load", (req, res) => {
   try {
-    let cmd = "select * from sales order by s_id desc";
+    let cmd = SelectStatement(
+      "select * from sales where s_date between ? and ? order by s_id desc",
+      [`${GetCurrentDate()} 00:00:00`, `${GetCurrentDate()} 23:59:59`]
+    );
 
     Select(cmd, (error, result) => {
       if (error) {
@@ -219,6 +223,14 @@ router.get("/getdetails/:id", (req, res) => {
 
       res.status(200).send({ msg: "success", data: resultJson });
     });
+  } catch (error) {
+    res.status(500).send({ msg: error });
+  }
+});
+
+router.get("/filter", (req, res) => {
+  try {
+    
   } catch (error) {
     res.status(500).send({ msg: error });
   }

@@ -6,6 +6,18 @@
     $("#orders-today").html(spinner);
     $("#customer-monthly").html(spinner);
 
+    const loader_orders = `  
+              <tr id="loading-state">
+                  <td><div class="custom-loader"></div></td>
+                  <td><div class="custom-loader"></div></td>
+                  <td><div class="custom-loader"></div></td>
+              </tr>`;
+
+    const tbody = $("#datatable-orders tbody");
+    for (let i = 0; i < 12; i++) {
+      tbody.append(loader_orders);
+    }
+
     getSalesDetails();
 
     function getSalesDetails() {
@@ -40,6 +52,109 @@
           console.error(result.msg);
         }
       });
+
+      Fetch("/getactiveorders", function (result) {
+        if (result.msg === "success") {
+          populatedatatable(result.data);
+        } else {
+          console.error(result.msg);
+        }
+      });
+
+      Fetch("/gettopproducts", function (result) {
+        if (result.msg === "success") {
+          populatedatatabletop(result.data);
+        } else {
+          console.error(result.msg);
+        }
+      });
+    }
+
+    function populatedatatable(data) {
+      console.log(data);
+      const tableBody = $("#datatable-orders tbody");
+      tableBody.empty();
+
+      if (data.length === 0) {
+        const tr = $("<tr>").append(
+          $("<td>", {
+            colspan: 3,
+            class: "text-center",
+            text: "No Orders",
+          })
+        );
+        tableBody.append(tr);
+      } else {
+        data.forEach((item) => {
+          let action = "";
+
+          const tr = $("<tr>").append(
+            $("<td>", {
+              text: item.customer,
+              "data-label": "Customer",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.address,
+              "data-label": "Address",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.status,
+              "data-label": "Status",
+              class: "custom-mobile-align",
+            })
+          );
+
+          tableBody.append(tr);
+        });
+      }
+    }
+
+    function populatedatatabletop(data) {
+      console.log(data);
+      const tableBody = $("#datatable-top tbody");
+      tableBody.empty();
+
+      if (data.length === 0) {
+        const tr = $("<tr>").append(
+          $("<td>", {
+            colspan: 2,
+            class: "text-center",
+            text: "No Orders",
+          })
+        );
+        tableBody.append(tr);
+      } else {
+        data.forEach((item) => {
+          let action = "";
+
+          const tr = $("<tr>").append(
+            $("<td>", {
+              text: item.name,
+              "data-label": "Name",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.price,
+              "data-label": "Price",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.quantity,
+              "data-label": "Quantity",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: `${formatCurrency(parseFloat(item.price) * parseFloat(item.quantity))}`,
+              "data-label": "Total",
+              class: "custom-mobile-align",
+            })
+          );
+
+          tableBody.append(tr);
+        });
+      }
     }
   });
 </script>
