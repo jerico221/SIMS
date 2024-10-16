@@ -23,9 +23,11 @@
                   <td><div class="custom-loader"></div></td>
                   <td><div class="custom-loader"></div></td>
                   <td><div class="custom-loader"></div></td>
+                  <td><div class="custom-loader"></div></td>
+                  <td><div class="custom-loader"></div></td>
               </tr>`;
 
-    const tbody_top = $("#datatable-orders tbody");
+    const tbody_top = $("#datatable-top tbody");
     for (let i = 0; i < 12; i++) {
       tbody_top.append(loader_top);
     }
@@ -158,7 +160,9 @@
               class: "custom-mobile-align",
             }),
             $("<td>", {
-              text: `${formatCurrency(parseFloat(item.price) * parseFloat(item.quantity))}`,
+              text: `${formatCurrency(
+                parseFloat(item.price) * parseFloat(item.quantity)
+              )}`,
               "data-label": "Total",
               class: "custom-mobile-align",
             })
