@@ -23,7 +23,7 @@ router.get("/customer/:id", (req, res) => {
   try {
     const { id } = req.params;
     let status = StatusMessage.CMP;
-    let sql = "select * from sims.order where o_customerid = ? and o_status = ?";
+    let sql = "select * from sims.order where o_customerid = ? and o_status = ? order by o_id desc";
     let cmd = SelectStatement(sql, [id, status]);
     Select(cmd, (error, result) => {
       if (error) {

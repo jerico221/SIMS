@@ -14,6 +14,7 @@ const { Validator } = require("./controller/validator");
 const { EncryptString } = require("./repository/cryptography");
 const { SendEmail } = require("./repository/mailer");
 const twilio = require("twilio");
+const axios = require("axios");
 
 var router = express.Router();
 
@@ -107,6 +108,8 @@ router.post("/register", (req, res) => {
 
               console.log(result);
 
+              sendSMS(contactno, randomNumber);
+
               SendEmail(
                 `${email}`,
                 `Account Verification ${GetCurrentDatetime()}`,
@@ -115,7 +118,7 @@ router.post("/register", (req, res) => {
                 </br> 
                 <h1>${randomNumber}</h1>
                 </br>
-                <a href="http://localhost:3000/verification/verify?id=${customerid}">Click here to verify</a>`
+                <a href="${process.env._BASE_URL}/verification/verify?id=${customerid}">Click here to verify</a>`
               );
             }
           );
@@ -212,29 +215,17 @@ router.get("/testmail", (req, res) => {
   }
 });
 
-router.get("/sendsms", (req, res) => {
+router.get("/sendsms", async (req, res) => {
   try {
-    const apikey = "978e7df3232caa81e275322a988919cb";
-    const number = "639560442139";
-    const message = "TEST";
-    const parameters = {
-      apikey,
-      number,
-      message,
-    };
+    const apikey = "a4d64e57c5c7ee8fa5968411ed214525";
 
-    fetch("https://api.semaphore.co/api/v4/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams(parameters),
-    })
-      .then((response) => response.text())
-      .then((output) => {
-        console.log(output);
-      })
-      .catch((error) => console.log(error));
+    const response = await axios.post("https://semaphore.co/api/v4/messages", {
+      apikey: apikey,
+      number: "+639560442139",
+      message: "I just sent my first message with Semaphore",
+      sendername: "NKitchen",
+    });
+    console.log("Message sent:", response.data);
     res.status(200).send({ msg: "success" });
   } catch (error) {
     res.status(500).send({ msg: error });
@@ -248,3 +239,18 @@ router.get("/test", (req, res) => {
   console.log(randomNumber);
   res.status(200).send({ msg: "success" });
 });
+
+async function sendSMS(number, message) {
+  try {
+    const apikey = process.env._SEMAPHORE_API_KEY;
+    const response = await axios.post("https://semaphore.co/api/v4/messages", {
+      apikey: apikey,
+      number: number,
+      message: `Your verification code is ${message}. Thank you registration.`,
+    });
+
+    console.log("Message sent:", response.data);
+  } catch (error) {
+    console.log("Error:", error);
+  }
+}

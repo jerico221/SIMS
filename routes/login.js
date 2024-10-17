@@ -25,7 +25,7 @@ router.post("/login", (req, res) => {
     if (username.includes("@")) {
       console.log("hit here @");
 
-      let sql = "select * from customer where c_email = ? and c_password = ?";
+      let sql = `select c_id, c_fullname, c_contactno, c_email, csp_points as c_storepoints from customer inner join customer_store_points where c_email = ? and c_password = ?`;
       let cmd = SelectStatement(sql, [username, EncryptString(password)]);
       Select(cmd, (error, result) => {
         if (error) {
@@ -40,6 +40,7 @@ router.post("/login", (req, res) => {
           req.session.fullname = data[0].fullname;
           req.session.customerid = data[0].id;
           req.session.access = "customer";
+          req.session.storepoints = parseFloat(data[0].storepoints).toFixed(2);
 
           console.log(data[0].status);
 
@@ -119,4 +120,40 @@ router.get("/logout", (req, res) => {
     }
     res.status(200).send({ msg: "success" });
   });
+});
+
+router.post("/logincustomer", (req, res) => {
+  try {
+    const { username, password } = req.body;
+    let sql = SelectStatement(
+      `select 
+        c_id,
+        c_fullname,
+        c_address,
+        c_contactno,
+        c_email,
+        c_status,
+        c_password,
+        csp_points as c_points 
+        from customer
+        inner join customer_store_points on c_id = csp_customerid 
+        where c_email = ? and c_password = ?`,
+      [username, EncryptString(password)]
+    );
+    Select(sql, (error, result) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).send({ msg: error });
+      }
+
+      if (result.length != 0) {
+        let data = DataModeling(result, "c_");
+        return res.status(200).send({ msg: "success", data: data });
+      } else {
+        return res.status(200).send({ msg: "failed", data: result });
+      }
+    });
+  } catch (error) {
+    res.status(500).send({ msg: error });
+  }
 });

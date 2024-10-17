@@ -1,7 +1,4 @@
-<ul
-  class="navbar-nav bg-gradient-secondary sidebar sidebar-dark accordion"
-  id="accordionSidebar"
->
+<ul class="navbar-nav sidebar-bg sidebar sidebar-dark accordion" id="accordionSidebar">
   <!-- Sidebar - Brand -->
   <a
     class="sidebar-brand d-flex align-items-center justify-content-center"
@@ -26,10 +23,9 @@
 
   <!-- Divider -->
   <hr class="sidebar-divider" />
-
+  <% if (access === "Admin" || access === "Owner") { %>
   <!-- Heading -->
   <div class="sidebar-heading">Masters</div>
-
   <!-- Nav Item - Pages Collapse Menu -->
   <li class="nav-item">
     <a
@@ -120,7 +116,9 @@
       </div>
     </div>
   </li>
-
+  <% }%> 
+  
+  <% if (access === "Admin" || access === "Owner" || access === "User") { %>
   <!-- Divider -->
   <hr class="sidebar-divider" />
 
@@ -147,16 +145,27 @@
       data-parent="#accordionSidebar"
     >
       <div class="bg-white py-2 collapse-inner rounded">
+        <% if (access === "Admin" || access === "Owner" ) { %>
         <h6 class="collapse-header">Sales Components:</h6>
         <a class="collapse-item" href="/sales">Sales</a>
+        <% } %>
+
+        <% if (access === "Admin" || access === "Owner" || access === "User" ) { %>
         <h6 class="collapse-header">Order Components:</h6>
         <a class="collapse-item" href="/order">Orders</a>
+        <% } %>
+
+        <% if (access === "Admin" || access === "Owner" ) { %>
         <h6 class="collapse-header">Point of Sale Components:</h6>
         <a class="collapse-item" href="/pos">POS</a>
+        <% } %>
       </div>
     </div>
   </li>
 
+  <% }%> 
+
+  <% if (access === "Admin" || access === "Owner" ) { %>
   <!-- Divider -->
   <hr class="sidebar-divider" />
 
@@ -222,7 +231,7 @@
       </div>
     </div>
   </li>
-
+ 
   <!-- Divider -->
   <hr class="sidebar-divider" />
 
@@ -255,7 +264,7 @@
       </div>
     </div>
   </li>
-
+  <% } %> <% if (access === "Agents" || access === "Admin" || access === "Owner" ) { %>
   <!-- Divider -->
   <hr class="sidebar-divider" />
 
@@ -287,12 +296,7 @@
       </div>
     </div>
   </li>
-
+  <% } %>
   <!-- Divider -->
-  <hr class="sidebar-divider d-none d-md-block" />
-
-  <!-- Sidebar Toggler (Sidebar) -->
-  <div class="text-center d-none d-md-inline">
-    <button class="rounded-circle border-0" id="sidebarToggle"></button>
-  </div>
+  <hr class="sidebar-divider" />
 </ul>

@@ -65,14 +65,14 @@ const roleacess = [
         layout: "indexlayout",
       },
       {
-        layout: "chatlayout",
+        layout: "orderlayout",
       },
     ],
     //#endregion
   },
 
   {
-    //#region User
+    //#region Agents
     role: "Agents",
     routes: [
       {
@@ -189,6 +189,7 @@ exports.Validator = function (req, res, layout) {
             customerid: req.session.customerid,
             access: req.session.access,
             agentid: req.session.agentid,
+            storepoints: req.session.storepoints,
           });
         }
       });

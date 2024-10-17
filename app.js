@@ -31,6 +31,8 @@ var verificationRouter = require("./routes/verification");
 var chatRouter = require("./routes/chat");
 var customerchatRouter = require("./routes/customerchat");
 
+var privacypolicyRouter = require("./routes/privacypolicy");
+
 const { SetMongo } = require("./routes/controller/mongodb");
 
 var app = express();
@@ -80,6 +82,8 @@ app.use("/customerstorepoints", customerstorepointsRouter);
 app.use("/verification", verificationRouter);
 app.use("/chat", chatRouter);
 app.use("/customerchat", customerchatRouter);
+
+app.use("/privacypolicy", privacypolicyRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

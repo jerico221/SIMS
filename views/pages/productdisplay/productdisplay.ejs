@@ -48,6 +48,9 @@
         </div>
       </div>
       <div class="modal-footer">
+        <div>
+          Total: <span id="total"></span>
+        </div>
         <button
           class="btn btn-success"
           type="button"
@@ -75,6 +78,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="checkoutModalLabel">Payment & Location</h5>
+      
         <button
           class="close"
           type="button"
@@ -95,6 +99,22 @@
               </Select>
             </div>
           </div>
+          <div id="pointsdisplay" class="col-md-6" hidden>
+            <div class="input-group">
+              <div class="input-group-append">
+                <label class="input-group-text" for="location"
+                  >Store Points</label
+                >
+              </div>
+              <input
+                id="points"
+                name="points"
+                class="form-control no-border"
+                type="text"
+                disabled
+              />
+            </div>
+          </div>
         </div>
         <div class="row mt-2">
           <div class="col-md-6">
@@ -113,7 +133,6 @@
           </div>
           <div class="col-md-6">
             <div class="input-group mb-3">
-             
               <input
                 type="text"
                 class="form-control"
@@ -130,6 +149,9 @@
         <div class="justify-content-center" id="map"></div>
       </div>
       <div class="modal-footer">
+        <div>
+          Total Amount Due: <span id="totalcheckout">0.00</span>
+        </div>
         <button class="btn btn-success" type="button" id="backBtn">
           Back to Cart
         </button>

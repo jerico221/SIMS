@@ -106,6 +106,44 @@
             </div>
           </div>
 
+          <div class="row">
+            <div class="col">
+              <div class="input-group mb-3">
+                <input
+                  autocomplete="off"
+                  id="posid"
+                  name="posid"
+                  type="text"
+                  class="form-control"
+                  placeholder="Enter POS ID"
+                  aria-label="Enter POS ID"
+                />
+                <div class="input-group-append">
+                  <span class="input-group-text">POS ID</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <div class="input-group mb-3">
+                <input
+                  autocomplete="off"
+                  id="date"
+                  name="date"
+                  type="text"
+                  class="form-control"
+                  placeholder="Select Date"
+                  aria-label="Select Date"
+                />
+                <div class="input-group-append">
+                  <span class="input-group-text">Date</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="row justify-content-center mt-2">
             <button
               class="btn btn-sm btn-outline-inventory w-75"
@@ -132,7 +170,7 @@
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header custom-bg">
-          <h5 class="modal-title" id="exampleModalLabel">Category</h5>
+          <h5 class="modal-title" id="exampleModalLabel">Sales Details</h5>
           <button
             type="button"
             class="close"
@@ -145,25 +183,41 @@
         <div class="custom-modal-body">
           <div class="card">
             <div class="card-header py-2 header-bg">
-              <h6 class="m-0 font-weight-bold table-title">Update Product:</h6>
-            </div>
-            <div class="card-body">
-              <div class="row mb-2 justify-content-center">
+              <h6 class="m-0 font-weight-bold table-title">Sales</h6>
+
+              <div class="row">
                 <div class="col-md-6">
                   <div class="input-group mb-3">
                     <input
                       autocomplete="off"
-                      id="idmodal"
-                      name="idmodal"
+                      id="transactionidmodal"
+                      name="transactionidmodal"
                       type="text"
                       class="form-control"
-                      placeholder="Enter new idmodal"
-                      aria-label="idmodal"
-                      aria-describedby="basic-addon1"
+                      placeholder="Enter Transaction ID"
+                      aria-label="Enter Transaction ID"
                       disabled
                     />
                     <div class="input-group-append">
-                      <span class="input-group-text">ID</span>
+                      <span class="input-group-text">Transaction ID</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="input-group mb-3">
+                    <input
+                      autocomplete="off"
+                      id="transactiondate"
+                      name="transactiondate"
+                      type="text"
+                      class="form-control"
+                      placeholder="Enter Transaction ID"
+                      aria-label="Enter Transaction ID"
+                      disabled
+                    />
+                    <div class="input-group-append">
+                      <span class="input-group-text">Date</span>
                     </div>
                   </div>
                 </div>
@@ -174,17 +228,16 @@
                   <div class="input-group mb-3">
                     <input
                       autocomplete="off"
-                      id="productnamemodal"
-                      name="productnamemodal"
+                      id="transactionposid"
+                      name="transactionposid"
                       type="text"
                       class="form-control"
-                      placeholder="Enter new productnamemodal"
-                      aria-label="productnamemodal"
-                      aria-describedby="basic-addon1"
+                      placeholder="Enter Transaction ID"
+                      aria-label="Enter Transaction ID"
+                      disabled
                     />
-
                     <div class="input-group-append">
-                      <span class="input-group-text">Product Name</span>
+                      <span class="input-group-text">POS ID</span>
                     </div>
                   </div>
                 </div>
@@ -193,100 +246,39 @@
                   <div class="input-group mb-3">
                     <input
                       autocomplete="off"
-                      id="categorymodal"
-                      name="categorymodal"
+                      id="transactionstatus"
+                      name="transactionstatus"
                       type="text"
                       class="form-control"
-                      placeholder="Enter new categorymodal"
-                      aria-label="categorymodal"
-                      aria-describedby="basic-addon1"
-                    />
-                    <input
-                      autocomplete="off"
-                      type="hidden"
-                      id="categorymodalID"
-                      name="categorymodalID"
+                      placeholder="Enter Transaction ID"
+                      aria-label="Enter Transaction ID"
+                      disabled
                     />
                     <div class="input-group-append">
-                      <span class="input-group-text">Category</span>
+                      <span class="input-group-text">Status</span>
                     </div>
                   </div>
-
-                  <div
-                    class="custom-dropdown cdw-tableoption"
-                    id="categorymodalDropdown"
-                  ></div>
                 </div>
               </div>
-
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="input-group mb-3">
-                    <input
-                      autocomplete="off"
-                      id="pricemodal"
-                      name="pricemodal"
-                      type="text"
-                      class="form-control"
-                      placeholder="Enter new pricemodal"
-                      aria-label="pricemodal"
-                      aria-describedby="basic-addon1"
-                      oninput="formatPrice(event, this)"
-                    />
-
-                    <div class="input-group-append">
-                      <span class="input-group-text">Price</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="col-md-6">
-                  <div class="input-group mb-3">
-                    <input
-                      autocomplete="off"
-                      id="isinventorymodal"
-                      name="isinventorymodal"
-                      type="text"
-                      class="form-control"
-                      placeholder="Enter new isinventorymodal"
-                      aria-label="isinventorymodal"
-                      aria-describedby="basic-addon1"
-                    />
-                    <input
-                      autocomplete="off"
-                      type="hidden"
-                      id="isinventorymodalID"
-                      name="isinventorymodalID"
-                    />
-                    <div class="input-group-append">
-                      <span class="input-group-text">Enable Inventory</span>
-                    </div>
-                  </div>
-                  <div
-                    class="custom-dropdown cdw-tableoption"
-                    id="isinventorymodalDropdown"
-                  ></div>
-                </div>
-              </div>
-
-              <div class="row justify-content-center">
-                <div class="col-md-6">
-                  <div class="text-center">
-                    <img
-                      id="productimagemodal"
-                      src="/images/img/logo.png"
-                      class="img-thumbnail"
-                      alt="..."
-                    />
-                    <input
-                      autocomplete="off"
-                      class="btn btn-outline-inventory w-100"
-                      type="file"
-                      id="imageInputModal"
-                      placeholder="Select Image"
-                    />
-                  </div>
-                </div>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive scroll-cardbody-size-710 border">
+                <table
+                  id="datatablemodal"
+                  class="table table-bordered custom-mobile-table"
+                  width="100%"
+                  cellspacing="10"
+                >
+                  <thead class="table-header">
+                    <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Price</th>
+                      <th>Quantity</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -300,19 +292,6 @@
             data-dismiss="modal"
           >
             Close
-          </button>
-          <button
-            type="button"
-            id="updateBtn"
-            class="btn btn-outline-inventory"
-          >
-            <span id="btn-label-modal">Update</span>
-            <span
-              id="btnSpinner-modal"
-              class="spinner-border spinner-border-sm d-none"
-              role="status"
-              aria-hidden="true"
-            ></span>
           </button>
         </div>
       </div>

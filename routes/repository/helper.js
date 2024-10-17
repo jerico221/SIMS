@@ -128,6 +128,8 @@ exports.Check = (sql) => {
     Select(sql, (error, result) => {
       if (error) reject(error);
 
+      console.log(result);
+
       resolve(result);
     });
   });
