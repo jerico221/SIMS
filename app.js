@@ -30,6 +30,7 @@ var customerstorepointsRouter = require("./routes/customerstorepoints");
 var verificationRouter = require("./routes/verification");
 var chatRouter = require("./routes/chat");
 var customerchatRouter = require("./routes/customerchat");
+var reportRouter = require("./routes/report");
 
 var privacypolicyRouter = require("./routes/privacypolicy");
 
@@ -82,6 +83,7 @@ app.use("/customerstorepoints", customerstorepointsRouter);
 app.use("/verification", verificationRouter);
 app.use("/chat", chatRouter);
 app.use("/customerchat", customerchatRouter);
+app.use("/reports", reportRouter);
 
 app.use("/privacypolicy", privacypolicyRouter);
 

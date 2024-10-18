@@ -54,6 +54,9 @@ const roleacess = [
       {
         layout: "chatlayout",
       },
+      {
+        layout: "reportlayout",
+      },
     ],
     //#endregion
   },
@@ -115,6 +118,9 @@ const roleacess = [
       {
         layout: "categorylayout",
       },
+      {
+        layout: "reportlayout",
+      },
     ],
     //#endregion
   },
@@ -148,6 +154,9 @@ const roleacess = [
       },
       {
         layout: "categorylayout",
+      },
+      {
+        layout: "reportlayout",
       },
     ],
     //#endregion
