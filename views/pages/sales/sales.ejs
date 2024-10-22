@@ -41,13 +41,6 @@
                 </div>
               </div>
             </div>
-            <div class="col-1">
-              <div class="row d-flex justify-content-center">
-                <button class="btn btn-outline-inventory ml-2" id="convertopdf">
-                  <i class="fas fa-download fa-sm"></i>
-                </button>
-              </div>
-            </div>
           </div>
         </div>
         <div class="card-body">
@@ -94,7 +87,7 @@
                   autocomplete="off"
                   id="transactionid"
                   name="transactionid"
-                  type="text"
+                  type="number"
                   class="form-control"
                   placeholder="Enter Transaction ID"
                   aria-label="Enter Transaction ID"
@@ -113,7 +106,7 @@
                   autocomplete="off"
                   id="posid"
                   name="posid"
-                  type="text"
+                  type="number"
                   class="form-control"
                   placeholder="Enter POS ID"
                   aria-label="Enter POS ID"
@@ -127,19 +120,28 @@
 
           <div class="row">
             <div class="col">
-              <div class="input-group mb-3">
+              <div class="input-group shadow">
+                <button
+                  id="adjustDateBackward"
+                  class="btn btn-outline-inventory custom-br-left"
+                >
+                  <i class="fas fa-caret-left"></i>
+                </button>
                 <input
-                  autocomplete="off"
-                  id="date"
-                  name="date"
+                  id="dateRange"
+                  name="dateRange"
                   type="text"
-                  class="form-control"
-                  placeholder="Select Date"
-                  aria-label="Select Date"
+                  class="form-control text-center daterange"
+                  placeholder="Select Date Range"
+                  aria-describedby="basic-addon1"
+                  readonly
                 />
-                <div class="input-group-append">
-                  <span class="input-group-text">Date</span>
-                </div>
+                <button
+                  id="adjustDateForward"
+                  class="btn btn-outline-inventory custom-br-right"
+                >
+                  <i class="fas fa-caret-right"></i>
+                </button>
               </div>
             </div>
           </div>
@@ -150,7 +152,7 @@
               type="button"
               id="filterBtn"
             >
-              Filter
+              Search
             </button>
           </div>
         </div>

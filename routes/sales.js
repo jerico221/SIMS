@@ -257,8 +257,53 @@ router.get("/getdetails/:id", (req, res) => {
   }
 });
 
-router.get("/filter", (req, res) => {
+router.post("/filter", (req, res) => {
   try {
+    const { transactionid, posid, date } = req.body;
+    let sql = "select * from sales where ";
+    let dateRange = date.split(" - ");
+    let startdate = dateRange[0];
+    let enddate = dateRange[1];
+    let data = [];
+
+    console.log(req.body);
+
+    if (transactionid) {
+      sql += `s_id = ? AND `;
+      data.push(transactionid);
+    }
+
+    if (posid) {
+      sql += `s_pos = ? AND `;
+      data.push(posid);
+    }
+    if (date) {
+      sql += `s_date between ? AND ? AND `;
+      data.push(`${startdate} 00:00:00`);
+      data.push(`${enddate} 23:59:59`);
+    }
+
+    sql = sql.slice(0, -5);
+
+    let cmd = SelectStatement(sql, data);
+
+    console.log(cmd);
+
+    Select(cmd, (error, result) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).send({ msg: error });
+      }
+
+      if (result.length != 0) {
+        let data = DataModeling(result, "s_");
+        console.log(data);
+
+        return res.status(200).send({ msg: "success", data: data });
+      } else {
+        return res.status(200).send({ msg: "success", data: result });
+      }
+    });
   } catch (error) {
     res.status(500).send({ msg: error });
   }
