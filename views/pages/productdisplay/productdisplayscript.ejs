@@ -442,7 +442,7 @@
     //#endregion
     function LoadProductDisplay() {
       $.ajax({
-        url: "/product/load",
+        url: "/product/stockload",
         type: "GET",
         success: function (data) {
           let result = data.data;
