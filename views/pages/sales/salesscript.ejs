@@ -4,6 +4,7 @@
     let status = "";
     let date = "";
     let posid = "";
+    let total = "";
     LoadTable();
 
     $("#datatable tbody").on("click", "tr", function () {
@@ -18,10 +19,11 @@
       id = dataRow[0];
       date = dataRow[1];
       posid = dataRow[2];
+      total = dataRow[3];
       status = dataRow[4];
     });
 
-    $(document).on("click", "#editBtn", function () {
+    $(document).on("click", "#viewDetailBtn", function () {
       console.log("click");
 
       $("#editModal").modal("show");
@@ -30,6 +32,7 @@
       $("#transactiondate").val(date);
       $("#transactionposid").val(posid);
       $("#transactionstatus").val(status);
+      $("#totalprice").html(total);
 
       Fetch(`/sales/getdetails/${id}`, (result) => {
         if (result.msg === "success") {
@@ -37,7 +40,17 @@
           const tableBody = $("#datatablemodal tbody");
           tableBody.empty();
 
-          if (result.data.length === 0) {
+          let data = result.data["items"];
+          let detail = result.data["detail"];
+
+          detail.forEach((item) => {
+            $("#paymenttype").val(item.paymenttype);
+            $("#cashier").val(item.cashier);
+            $("#amounttender").val(formatCurrency(item.cashreceive));
+            $("#change").val(formatCurrency(item.change));
+          });
+
+          if (data === 0) {
             const tr = $("<tr>").append(
               $("<td>", {
                 colspan: 4,
@@ -47,7 +60,7 @@
             );
             tableBody.append(tr);
           } else {
-            result.data.forEach((item) => {
+            data.forEach((item) => {
               const tr = $("<tr>").append(
                 $("<td>", {
                   text: item.id,
@@ -117,7 +130,7 @@
         data.forEach((item) => {
           let action = "";
           if (item.status === "SOLD") {
-            action = `<span class="editbutton" name="editBtn" id="editBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>`;
+            action = `<span class="editbutton" name="viewDetailBtn" id="viewDetailBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>`;
           }
           const statusBackground = getStatusBackground(item.status);
           const containerBackground = getContainerBackground(item.status);

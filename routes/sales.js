@@ -197,7 +197,23 @@ router.post("/getdetails", (req, res) => {
 router.get("/getdetails/:id", (req, res) => {
   try {
     const { id } = req.params;
-    let sql = SelectStatement("select * from sales where s_id = ?", [id]);
+    let sql = SelectStatement(
+      `select 
+      s_id,
+      s_date,
+      e_fullname as s_cashier,
+      s_pos,
+      p_name as s_paymenttype,
+      s_details,
+      s_total,
+      s_cashreceive,
+      s_change,
+      s_status 
+      from sales
+      inner join payment on p_id = s_paymenttype
+      inner join employee on e_id = s_cashier where s_id = ?`,
+      [id]
+    );
     Select(sql, (error, result) => {
       if (error) {
         console.error(error);
@@ -221,7 +237,20 @@ router.get("/getdetails/:id", (req, res) => {
         });
       });
 
-      res.status(200).send({ msg: "success", data: resultJson });
+      res.status(200).send({
+        msg: "success",
+        data: {
+          detail: [
+            {
+              cashier: data[0].cashier,
+              paymenttype: data[0].paymenttype,
+              cashreceive: data[0].cashreceive,
+              change: data[0].change,
+            },
+          ],
+          items: resultJson,
+        },
+      });
     });
   } catch (error) {
     res.status(500).send({ msg: error });
@@ -230,7 +259,6 @@ router.get("/getdetails/:id", (req, res) => {
 
 router.get("/filter", (req, res) => {
   try {
-    
   } catch (error) {
     res.status(500).send({ msg: error });
   }

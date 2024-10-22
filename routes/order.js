@@ -118,6 +118,9 @@ router.post("/save", (req, res) => {
                 ["points"],
                 ["id"]
               );
+
+              console.log(sql);
+
               let current_balance = parseFloat(storepoints) - total;
               console.log(current_balance, storepoints);
 
@@ -137,7 +140,7 @@ router.post("/save", (req, res) => {
               ]);
 
               let history_data = [
-                [customerid, GetCurrentDatetime(), storepoints, "Points Deducted"],
+                [customerid, GetCurrentDatetime(), total, "Points Deducted"],
               ];
 
               InsertTable(history, history_data, (err, result) => {
@@ -346,6 +349,53 @@ router.delete("/delete", (req, res) => {
       }
 
       res.status(200).send({ msg: "success" });
+    });
+  } catch (error) {
+    res.status(500).send({ msg: error });
+  }
+});
+
+router.get("/getorderdetails/:id", (req, res) => {
+  try {
+    const { id } = req.params;
+    let sql = SelectStatement("select * from sims.order where o_id = ?", [id]);
+    Select(sql, (error, result) => {
+      if (error) {
+        console.error(error);
+
+        return res.status(500).send({ msg: error });
+      }
+
+      let data = DataModeling(result, "o_");
+      let dataJson = JSON.parse(data[0].details);
+      console.log(dataJson);
+      let arrayJson = dataJson[0].cart;
+      let resultJson = [];
+
+      arrayJson.forEach((key, item) => {
+        const { id, name, price, quantity } = key;
+        console.log(id, name, price, quantity);
+        resultJson.push({
+          id: id,
+          name: name,
+          price: price,
+          quantity: quantity,
+        });
+      });
+
+      res.status(200).send({
+        msg: "success",
+        data: {
+          detail: [
+            {
+              total: dataJson[0].total,
+              payment: dataJson[0].payment,
+              address: dataJson[0].address,
+            },
+          ],
+          items: resultJson,
+        },
+      });
     });
   } catch (error) {
     res.status(500).send({ msg: error });
