@@ -49,7 +49,13 @@ router.get("/load", (req, res) => {
 
 router.post("/save", (req, res) => {
   try {
-    const { details, paymentmethod, customerid, storepoints } = req.body;
+    const {
+      details,
+      paymentmethod,
+      customerid,
+      storepoints,
+      verificationcode,
+    } = req.body;
     let status = StatusMessage.PND;
     let date = GetCurrentDatetime();
 
@@ -396,6 +402,91 @@ router.get("/getorderdetails/:id", (req, res) => {
           items: resultJson,
         },
       });
+    });
+  } catch (error) {
+    res.status(500).send({ msg: error });
+  }
+});
+
+router.post("/createverificationcode/", (req, res) => {
+  try {
+    const { customerid, amount } = req.body;
+    const randomNumber = Math.floor(100000 + Math.random() * 900000);
+    const date = GetCurrentDatetime();
+
+    let sql_check = SelectStatement(
+      "select c_email as email from customer where c_id=?",
+      [customerid]
+    );
+    Check(sql_check).then((result) => {
+      if (result.length != 0) {
+        let email = result[0].email;
+        let data = [
+          [customerid, date, randomNumber, amount, StatusMessage.PND],
+        ];
+        let cmd = InsertStatement("storepoint_verification", "sv", [
+          "customerid",
+          "date",
+          "code",
+          "amount",
+          "status",
+        ]);
+
+        InsertTable(cmd, data, (error, result) => {
+          if (error) {
+            console.error(error);
+            return res.status(500).send({ msg: error });
+          }
+
+          SendEmail(
+            `${email}`,
+            `Store Points Verification ${GetCurrentDatetime()}`,
+            `<p>Here is your verification code</p>
+            </br>
+            Code: <strong>${randomNumber}</strong> 
+            `
+          );
+
+          res.status(200).send({ msg: "success" });
+        });
+      } else {
+        res.status(200).send({ msg: "success" });
+      }
+    });
+  } catch (error) {
+    res.status(500).send({ msg: error });
+  }
+});
+
+router.post("/storepointverificationcode", (req, res) => {
+  try {
+    const { customerid, code } = req.body;
+    let sql_check = SelectStatement(
+      "select * from storepoint_verification where sv_customerid=? and sv_code=? and not sv_status=?",
+      [customerid, code, StatusMessage.CMP]
+    );
+
+    console.log(sql_check);
+
+    Check(sql_check).then((result) => {
+      if (result.length != 0) {
+        let data = [StatusMessage.CMP, customerid, code];
+        let updateStatement = UpdateStatement(
+          "storepoint_verification",
+          "sv",
+          ["status"],
+          ["customerid", "code"]
+        );
+
+        Update(updateStatement, data, (err, result) => {
+          if (err) console.error("Error: ", err);
+          console.log(result);
+        });
+
+        res.status(200).send({ msg: "success" });
+      } else {
+        res.status(200).send({ msg: "already in use" });
+      }
     });
   } catch (error) {
     res.status(500).send({ msg: error });
