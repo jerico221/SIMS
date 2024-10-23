@@ -1,0 +1,234 @@
+<script>
+  $(document).ready(function () {
+    let grossSalesChart;
+
+    LoadingState();
+
+    //#region Date Ranger Picker
+    $("#dateRange").daterangepicker({
+      opens: "right",
+      startDate: moment(), //@add .subtract(7, 'days') for weekly view
+      endDate: moment(),
+      maxDate: moment(),
+      alwaysShowCalendars: true,
+      showCustomRangeLabel: false,
+      buttonClasses: ["btn btn-outline-inventory"],
+      applyButtonClasses: ["test"],
+      locale: {
+        format: "MMM D, YYYY",
+      },
+    });
+
+    $("#adjustDateBackward").on("click", function () {
+      var startDate = $("#dateRange").data("daterangepicker").startDate;
+      var endDate = $("#dateRange")
+        .data("daterangepicker")
+        .endDate.clone()
+        .subtract(7, "days");
+      $("#dateRange").data("daterangepicker").setEndDate(endDate);
+      $("#dateRange")
+        .data("daterangepicker")
+        .setStartDate(startDate.clone().subtract(7, "days"));
+
+      refreshData(dateRange);
+    });
+
+    $("#adjustDateForward").on("click", function () {
+      var startDate = $("#dateRange").data("daterangepicker").startDate;
+      var endDate = $("#dateRange")
+        .data("daterangepicker")
+        .endDate.clone()
+        .add(7, "days");
+      $("#dateRange")
+        .data("daterangepicker")
+        .setStartDate(startDate.clone().add(7, "days"));
+      $("#dateRange").data("daterangepicker").setEndDate(endDate);
+
+      refreshData(dateRange);
+    });
+    //#endregion
+
+    //#region Initial Display
+    const InitialDate = $("#dateRange").val();
+    // console.log(InitialDate);
+
+    SalesDetailChart(InitialDate);
+    //#endregion
+
+    //#region Refresh
+    $(document).on("click", ".applyBtn", function () {
+      console.log(dateRange);
+      refreshData(dateRange);
+    });
+
+    function refreshData(daterange) {
+      const date = $("#dateRange").val();
+      LoadingState();
+
+      if (grossSalesChart) {
+        grossSalesChart.destroy();
+        grossSalesChart = null;
+      }
+      SalesDetailChart(date);
+    }
+    //#endregion
+
+    //#region Sales Details
+    function SalesDetailChart(daterange) {
+      let formattedDate = formatDate(daterange);
+
+      Fetch("/reports/salesgraph/" + formattedDate, function (result) {
+        const salesGraph = $("#sales-graph-loader");
+        salesGraph.empty();
+        let sDate = moment(daterange.split(" - ")[0], "MMM D, YYYY").format(
+          "YYYY-MM-DD"
+        );
+        let eDate = moment(daterange.split(" - ")[1], "MMM D, YYYY").format(
+          "YYYY-MM-DD"
+        );
+        let filteredData = {};
+
+        // console.log(result.data)
+        let currentDate = moment(sDate);
+        while (currentDate.isSameOrBefore(eDate, "day")) {
+          filteredData[currentDate.format("YYYY-MM-DD")] = { total: 0 };
+          currentDate.add(1, "days");
+        }
+
+        let labels = [];
+        let data = [];
+
+        result.data.forEach((item) => {
+          //   let date = item.date.split(" ")[0];
+
+          //   if (!filteredData[date]) {
+          //     filteredData[date] = { total: 0 };
+          //   }
+
+          //   filteredData[date].total += parseFloat(item.total);
+          labels.push(item.name);
+          data.push(item.quantity);
+        });
+
+        console.log(labels, data);
+
+        // console.log("Filtered Data:", filteredData);
+
+        // Object.keys(filteredData).forEach((date) => {
+        //   labels.push(date);
+        //   data.push(filteredData[date].total);
+        // });
+
+        let ctx = document.getElementById("gross-sales-chart").getContext("2d");
+
+        if (!grossSalesChart) {
+          grossSalesChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels: labels,
+              datasets: [
+                {
+                  label: "Net Sales",
+                  data: data,
+                  borderColor: "rgb(52, 177, 170, 0.75)",
+                  backgroundColor: "rgb(52, 177, 170, 0.10)",
+                  fill: "start",
+                  lineTension: 0.4,
+                },
+              ],
+            },
+            options: {
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false,
+                },
+              },
+              scales: {
+                x: {
+                  grid: {
+                    display: false,
+                  },
+                  offset: true,
+                  ticks: {
+                    font: {
+                      family: "Share Tech",
+                      size: 12.5,
+                    },
+                  },
+                },
+                y: {
+                  display: false,
+                  grid: {
+                    display: false,
+                  },
+                  ticks: {
+                    callback: function (value, index, values) {
+                      return formatCurrency(value);
+                    },
+                  },
+                },
+              },
+            },
+          });
+        }
+      });
+    }
+
+    //#endregion
+
+    //#region Date Formatting
+    function formatDate(date) {
+      let startDate = moment(date.split(" - ")[0], "MMM D, YYYY").format(
+        "YYYY-MM-DD"
+      );
+      let endDate = moment(date.split(" - ")[1], "MMM D, YYYY").format(
+        "YYYY-MM-DD"
+      );
+      let formattedDate = startDate + " - " + endDate;
+
+      //   console.log(formattedDate);
+
+      return formattedDate;
+    }
+    //#endregion
+
+    //#region Loading State
+    function LoadingState() {
+      //   const tableBody = $("#top-selling-products-table tbody");
+      //   tableBody.empty();
+      //   const loader = `
+      //           <tr id="loading-state">
+      //               <td><div class="custom-loader"></div></td>
+      //               <td><div class="custom-loader"></div></td>
+      //               <td><div class="custom-loader"></div></td>
+      //               <td><div class="custom-loader"></div></td>
+      //               <td><div class="custom-loader"></div></td>
+      //               <td><div class="custom-loader"></div></td>
+      //           </tr>`;
+
+      //   for (let i = 0; i < 6; i++) {
+      //     tableBody.append(loader);
+      //   }
+
+      const salesGraph = $("#sales-graph-loader");
+      salesGraph.empty();
+
+      const graphLoading = `
+              <div class="row justify-content-center mobile-hidden align-items-center"
+                  style="height: 220px;">
+                  <div class="loading-wave" id="graph-loading">
+                      <div class="loading-bar"></div>
+                      <div class="loading-bar"></div>
+                      <div class="loading-bar"></div>
+                      <div class="loading-bar"></div>
+                      <div class="loading-bar"></div>
+                      <div class="loading-bar"></div>
+                  </div>
+              </div>`;
+
+      salesGraph.append(graphLoading);
+    }
+    //#endregion
+  });
+</script>

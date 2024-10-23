@@ -115,9 +115,6 @@ router.post("/register", (req, res) => {
                 `Account Verification ${GetCurrentDatetime()}`,
                 `<p>Please verify your account by clicking the link below</p>
                 </br>
-                </br> 
-                <h1>${randomNumber}</h1>
-                </br>
                 <a href="${process.env._BASE_URL}/verification/verify?id=${customerid}">Click here to verify</a>`
               );
             }
@@ -246,7 +243,8 @@ async function sendSMS(number, message) {
     const response = await axios.post("https://semaphore.co/api/v4/messages", {
       apikey: apikey,
       number: number,
-      message: `Your verification code is ${message}. Thank you registration.`,
+      message: `Thank you for your registration on Navas Kitchen. Your verification code is ${message}. Thank you registration.`,
+      sendername: "NKitchen",
     });
 
     console.log("Message sent:", response.data);

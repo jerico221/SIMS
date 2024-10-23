@@ -314,11 +314,34 @@
       $("#checkoutModal").modal("hide");
     });
 
+    $(document).on("click", "#requestBtn", function () {
+      $.ajax({
+        type: "POST",
+        url: "/order/createverificationcode",
+        data: {
+          customerid: customerid,
+          amount: total,
+        },
+        success: function (result) {
+          if (result.msg == "success") {
+            success(
+              "Success",
+              "Please check your email for verification code!"
+            );
+          }
+        },
+        error: function (error) {
+          warning("Error", error);
+        },
+      });
+    });
+
     $(document).on("click", "#proceedBtn", function () {
       let location = $("#location").val();
       let address = $("#address").val();
       let payment = $("#payment").val();
       let points = $("#points").val();
+      let verificationcode = $("#verificationcode").val();
       let storepoints = parseFloat(RemoveCurrencyFormatting(points));
       let message = "";
 
@@ -336,50 +359,78 @@
         if (storepoints < total) {
           message += "Insufficient Points";
         }
+
+        if (verificationcode == "") {
+          message += "Verification Code";
+        }
       }
 
       if (message != "") {
         warning("Required", `${message} is required!`);
       } else {
-        let data = [
-          {
-            location: location,
-            address: address,
-            payment: payment,
-            cart: details,
-            total: total,
-          },
-        ];
-        $.ajax({
-          type: "POST",
-          url: "/order/save",
-          data: {
-            details: JSON.stringify(data),
-            paymentmethod: payment,
-            customerid: customerid,
-            storepoints: storepoints,
-          },
-          success: function (result) {
-            if (result.msg == "success") {
-              cart = [];
-              details = [];
-              itemcart = 0;
-              total = 0;
-              $("#counter").text(itemcart);
-              $("#checkoutModal").modal("hide");
-              success("Success", "New order successfully added!");
-
-              setTimeout(() => {
-                window.location.replace("/productdisplay");
-              }, 3000);
-            } else if (result.msg == "exist") {
-              warning("Warning", `There is an existing order!`);
+        if (payment == "Store Points") {
+          Upsert(
+            "POST",
+            "/order/storepointverificationcode",
+            {
+              customerid: customerid,
+              code: verificationcode,
+            },
+            (result) => {
+              let response = result.msg;
+              if (response == "success") {
+                ProcessData();
+              } else {
+                warning("Error", response);
+              }
             }
-          },
-          error: function (error) {
-            warning("Error", error);
-          },
-        });
+          );
+        }
+        else{
+          ProcessData();
+        }
+
+        function ProcessData() {
+          let data = [
+            {
+              location: location,
+              address: address,
+              payment: payment,
+              cart: details,
+              total: total,
+            },
+          ];
+          $.ajax({
+            type: "POST",
+            url: "/order/save",
+            data: {
+              details: JSON.stringify(data),
+              paymentmethod: payment,
+              customerid: customerid,
+              storepoints: storepoints,
+            },
+            success: function (result) {
+              if (result.msg == "success") {
+                cart = [];
+                details = [];
+                itemcart = 0;
+                total = 0;
+                $("#counter").text(itemcart);
+                $("#checkoutModal").modal("hide");
+                success("Success", "New order successfully added!");
+
+                setTimeout(() => {
+                  window.location.replace("/productdisplay");
+                }, 3000);
+              } else if (result.msg == "exist") {
+                warning("Warning", `There is an existing order!`);
+              }
+            },
+            error: function (error) {
+              warning("Error", error);
+            },
+          });
+        }
       }
     });
 
@@ -442,7 +493,7 @@
     //#endregion
     function LoadProductDisplay() {
       $.ajax({
-        url: "/product/load",
+        url: "/product/stockload",
         type: "GET",
         success: function (data) {
           let result = data.data;

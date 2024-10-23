@@ -13,12 +13,112 @@
             <th>ID</th>
             <th>Date</th>
             <th>Customer Name</th>
+            <th>Payment Method</th>
             <th>Details</th>
             <th>Status</th>
             <th>Action</th>
           </thead>
           <tbody></tbody>
         </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="viewModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header custom-bg">
+        <h5 class="modal-title" id="exampleModalLabel">Order Details</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="custom-modal-body">
+        <div class="card">
+          <div class="card-header py-2 header-bg">
+            <h6 class="m-0 font-weight-bold table-title">Order Details</h6>
+            <div class="row mt-2">
+              <div class="col-md-6">
+                <div class="input-group mb-3">
+                  <input
+                    autocomplete="off"
+                    id="payment"
+                    name="payment"
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter Payment"
+                    aria-label="Enter Payment"
+                    disabled
+                  />
+                  <div class="input-group-append">
+                    <span class="input-group-text">Payment</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mt-2">
+              <div class="col-md-12">
+                <div class="input-group mb-6">
+                  <textarea
+                    name="address"
+                    id="address"
+                    cols="100"
+                    rows="3"
+                    disabled
+                  ></textarea>
+                  <div class="input-group-append">
+                    <span class="input-group-text">Location</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive scroll-cardbody-size-710 border">
+              <table
+                id="datatablemodal"
+                class="table table-bordered custom-mobile-table"
+                width="100%"
+                cellspacing="10"
+              >
+                <thead class="table-header">
+                  <tr>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          type="button"
+          id="closeBtn"
+          class="btn btn-outline-inventory"
+          data-dismiss="modal"
+        >
+          Close
+        </button>
       </div>
     </div>
   </div>

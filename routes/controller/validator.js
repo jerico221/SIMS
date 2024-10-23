@@ -54,6 +54,9 @@ const roleacess = [
       {
         layout: "chatlayout",
       },
+      {
+        layout: "reportlayout",
+      },
     ],
     //#endregion
   },
@@ -115,6 +118,9 @@ const roleacess = [
       {
         layout: "categorylayout",
       },
+      {
+        layout: "reportlayout",
+      },
     ],
     //#endregion
   },
@@ -149,6 +155,9 @@ const roleacess = [
       {
         layout: "categorylayout",
       },
+      {
+        layout: "reportlayout",
+      },
     ],
     //#endregion
   },
@@ -174,25 +183,27 @@ const roleacess = [
   },
 ];
 
-exports.Validator = function (req, res, layout) {
+exports.Validator = function (req, res, routelayout) {
   if (req.session.access == undefined) {
     res.redirect("/login");
   } else {
-    roleacess.forEach((key, item) => {
-      var routes = key.routes;
-      routes.forEach((value, index) => {
-        if (key.role == req.session.access && value.layout == layout) {
-          console.log(req.session.access, layout);
-          return res.render(`${layout}`, {
-            employeeid: req.session.employeeid,
-            fullname: req.session.fullname,
-            customerid: req.session.customerid,
-            access: req.session.access,
-            agentid: req.session.agentid,
-            storepoints: req.session.storepoints,
-          });
+    for (const access of roleacess) {
+      const { role, routes } = access;
+      if (role == req.session.access) {
+        for (const route of routes) {
+          const { layout } = route;
+          if (layout == routelayout) {
+            return res.render(`${routelayout}`, {
+              employeeid: req.session.employeeid,
+              fullname: req.session.fullname,
+              customerid: req.session.customerid,
+              access: req.session.access,
+              agentid: req.session.agentid,
+              storepoints: req.session.storepoints,
+            });
+          }
         }
-      });
-    });
+      }
+    }
   }
 };

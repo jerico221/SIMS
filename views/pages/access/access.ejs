@@ -34,21 +34,52 @@
 
   <hr class="border border-2 opacity-50" />
 
-  <div class="table-responsive">
-    <table
-      id="datatable"
-      class="table table-hover table-light table-bordered border-primary"
-    >
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Access Name</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+  <div class="card">
+    <div class="card-header">
+      <h6 class="mt-2 ml-3 font-weight-bold h4 label-title">Access Table</h6>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="input-group">
+            <input
+              autocomplete="off"
+              type="text"
+              class="form-control bg-light small"
+              placeholder="Search for..."
+              aria-label="Search"
+              aria-describedby="basic-addon2"
+              id="search-input"
+            />
+            <div class="input-group-append">
+              <button
+                class="btn sis-btn-color"
+                type="button"
+                id="search-button"
+              >
+                <i class="fas fa-search fa-sm"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table
+          id="datatable"
+          class="table table-hover table-light table-bordered border-primary"
+        >
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Access Name</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <!-- Modal -->

@@ -52,11 +52,54 @@
       }
     });
 
-    $(document).on("click", "#editBtn", function () {
-      $("#idmodal").val(id);
+    $(document).on("click", "#viewBtn", function () {
       $("#editModal").modal("show");
-      $("#ordermodal").val(name);
-      console.log(id);
+
+      Fetch(`/order/getorderdetails/${id}`, (result) => {
+        if (result.msg === "success") {
+          console.log(result.data);
+          const tableBody = $("#datatablemodal tbody");
+          tableBody.empty();
+
+          let data = result.data["items"];
+          let detail = result.data["detail"];
+
+          detail.forEach((item) => {
+            $("#payment").val(item.payment);
+            $("#address").val(item.address);
+          });
+
+          if (data === 0) {
+            const tr = $("<tr>").append(
+              $("<td>", {
+                colspan: 4,
+                class: "text-center",
+                text: "No Data Matched",
+              })
+            );
+            tableBody.append(tr);
+          } else {
+            data.forEach((item) => {
+              const tr = $("<tr>").append(
+                $("<td>", {
+                  text: item.name,
+                  "data-label": "Name",
+                  class: "custom-mobile-align",
+                }),
+                $("<td>", {
+                  text: item.quantity,
+                  "data-label": "Quantity",
+                  class: "custom-mobile-align",
+                })
+              );
+
+              tableBody.append(tr);
+            });
+          }
+        } else {
+          console.error(result.msg);
+        }
+      });
     });
     //Edit Update
     $(document).on("click", "#saveBtn", function () {
@@ -210,6 +253,7 @@
           let address = "";
           let order = "";
           let orderlist = "";
+          let total = "";
           if (item.status === "PENDING") {
             action = `
               <span class="editbutton mr-2" id="viewBtn" name="viewBtn" data-toggle="modal" data-target="#viewModal"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>
@@ -233,6 +277,7 @@
             location = item.location;
             address = item.address;
             order = item.cart;
+            total = item.total;
           });
 
           order.forEach((item) => {
@@ -254,6 +299,12 @@
             $("<td>", {
               text: item.customerid,
               "data-label": "order",
+              class: "custom-mobile-align",
+            }),
+
+            $("<td>", {
+              text: `${item.paymentmethod} - ${formatCurrency(total)}`,
+              "data-label": "paymentmethod",
               class: "custom-mobile-align",
             }),
 

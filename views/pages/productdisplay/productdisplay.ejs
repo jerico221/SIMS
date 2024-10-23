@@ -48,9 +48,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <div>
-          Total: <span id="total"></span>
-        </div>
+        <div>Total: <span id="total"></span></div>
         <button
           class="btn btn-success"
           type="button"
@@ -78,7 +76,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="checkoutModalLabel">Payment & Location</h5>
-      
+
         <button
           class="close"
           type="button"
@@ -90,7 +88,7 @@
       </div>
       <div class="modal-body">
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-3">
             <div class="form-group">
               <Select id="payment" class="form-control">
                 <Option value="--">Select Payment</Option>
@@ -99,20 +97,44 @@
               </Select>
             </div>
           </div>
-          <div id="pointsdisplay" class="col-md-6" hidden>
-            <div class="input-group">
-              <div class="input-group-append">
-                <label class="input-group-text" for="location"
-                  >Store Points</label
-                >
+          <div id="pointsdisplay" class="col-md-9" hidden>
+            <div class="row">
+              <div class="col-sm-3">
+                <div class="input-group">
+                  <div class="input-group-append">
+                    <label class="input-group-text" for="location"
+                      >Store Points</label
+                    >
+                  </div>
+                  <input
+                    id="points"
+                    name="points"
+                    class="form-control no-border"
+                    type="text"
+                    disabled
+                  />
+                </div>
               </div>
-              <input
-                id="points"
-                name="points"
-                class="form-control no-border"
-                type="text"
-                disabled
-              />
+
+              <div class="col-sm-9">
+                <div class="input-group">
+                  <div class="input-group-append">
+                    <label class="input-group-text" for="location"
+                      >Verification Code</label
+                    >
+                  </div>
+                  <input
+                    id="verificationcode"
+                    name="verificationcode"
+                    class="form-control no-border"
+                    type="text"
+                    placeholder="Enter Verification Code"
+                  />
+                  <div class="input-group-append">
+                    <button class="btn btn-info" type="button" id="requestBtn">Request Code</button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -149,9 +171,7 @@
         <div class="justify-content-center" id="map"></div>
       </div>
       <div class="modal-footer">
-        <div>
-          Total Amount Due: <span id="totalcheckout">0.00</span>
-        </div>
+        <div>Total Amount Due: <span id="totalcheckout">0.00</span></div>
         <button class="btn btn-success" type="button" id="backBtn">
           Back to Cart
         </button>

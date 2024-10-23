@@ -4,6 +4,7 @@
     let status = "";
     let date = "";
     let posid = "";
+    let total = "";
     LoadTable();
 
     $("#datatable tbody").on("click", "tr", function () {
@@ -18,10 +19,11 @@
       id = dataRow[0];
       date = dataRow[1];
       posid = dataRow[2];
+      total = dataRow[3];
       status = dataRow[4];
     });
 
-    $(document).on("click", "#editBtn", function () {
+    $(document).on("click", "#viewDetailBtn", function () {
       console.log("click");
 
       $("#editModal").modal("show");
@@ -30,6 +32,7 @@
       $("#transactiondate").val(date);
       $("#transactionposid").val(posid);
       $("#transactionstatus").val(status);
+      $("#totalprice").html(total);
 
       Fetch(`/sales/getdetails/${id}`, (result) => {
         if (result.msg === "success") {
@@ -37,7 +40,17 @@
           const tableBody = $("#datatablemodal tbody");
           tableBody.empty();
 
-          if (result.data.length === 0) {
+          let data = result.data["items"];
+          let detail = result.data["detail"];
+
+          detail.forEach((item) => {
+            $("#paymenttype").val(item.paymenttype);
+            $("#cashier").val(item.cashier);
+            $("#amounttender").val(formatCurrency(item.cashreceive));
+            $("#change").val(formatCurrency(item.change));
+          });
+
+          if (data === 0) {
             const tr = $("<tr>").append(
               $("<td>", {
                 colspan: 4,
@@ -47,7 +60,7 @@
             );
             tableBody.append(tr);
           } else {
-            result.data.forEach((item) => {
+            data.forEach((item) => {
               const tr = $("<tr>").append(
                 $("<td>", {
                   text: item.id,
@@ -78,6 +91,38 @@
           console.error(result.msg);
         }
       });
+    });
+
+    $(document).on("click", "#filterBtn", function () {
+      let date = formatDate($("#dateRange").val());
+      let transactionid = $("#transactionid").val();
+      let posid = $("#posid").val();
+      let message = "";
+
+      if (date == "" && transactionid == "" && posid == "") {
+        message += "Input at least one field to search";
+      }
+      if (message != "") {
+        warning("Required", message);
+      } else {
+        $.ajax({
+          type: "POST",
+          url: "/sales/filter",
+          data: {
+            transactionid: transactionid,
+            posid: posid,
+            date: date,
+          },
+          success: function (result) {
+            if (result.msg == "success") {
+              populatedatatable(result.data);
+            }
+          },
+          error: function (error) {
+            warning("Error", error);
+          },
+        });
+      }
     });
 
     function LoadTable() {
@@ -117,7 +162,7 @@
         data.forEach((item) => {
           let action = "";
           if (item.status === "SOLD") {
-            action = `<span class="editbutton" name="editBtn" id="editBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>`;
+            action = `<span class="editbutton" name="viewDetailBtn" id="viewDetailBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>`;
           }
           const statusBackground = getStatusBackground(item.status);
           const containerBackground = getContainerBackground(item.status);
@@ -162,5 +207,96 @@
         });
       }
     }
+
+    function filterTableRows() {
+      const searchQuery = $("#search-input").val().trim().toLowerCase();
+      let foundMatches = false;
+
+      $("#no-match-row").remove();
+
+      $("#datatable tbody tr").each(function () {
+        const rowData = $(this).text().toLowerCase();
+        if (rowData.includes(searchQuery)) {
+          $(this).show();
+          foundMatches = true;
+        } else {
+          $(this).hide();
+        }
+      });
+
+      if (!foundMatches) {
+        const noMatchRow = $("<tr>").append(
+          $("<td>", {
+            colspan: 6,
+            class: "text-center",
+            text: "No Data Matched",
+          })
+        );
+        $("#datatable tbody").append(noMatchRow);
+        noMatchRow.attr("id", "no-match-row");
+      }
+    }
+
+    $("#search-input").on("input", filterTableRows);
+
+    //#region Date Formatting
+    function formatDate(date) {
+      let startDate = moment(date.split(" - ")[0], "MMM D, YYYY").format(
+        "YYYY-MM-DD"
+      );
+      let endDate = moment(date.split(" - ")[1], "MMM D, YYYY").format(
+        "YYYY-MM-DD"
+      );
+      let formattedDate = startDate + " - " + endDate;
+
+      //   console.log(formattedDate);
+
+      return formattedDate;
+    }
+    //#endregion
+
+    //#region Date Ranger Picker
+    $("#dateRange").daterangepicker({
+      opens: "right",
+      startDate: moment(), //@add .subtract(7, 'days') for weekly view
+      endDate: moment(),
+      maxDate: moment(),
+      alwaysShowCalendars: true,
+      showCustomRangeLabel: false,
+      buttonClasses: ["btn btn-outline-inventory"],
+      applyButtonClasses: ["test"],
+      locale: {
+        format: "MMM D, YYYY",
+      },
+    });
+
+    $("#adjustDateBackward").on("click", function () {
+      var startDate = $("#dateRange").data("daterangepicker").startDate;
+      var endDate = $("#dateRange")
+        .data("daterangepicker")
+        .endDate.clone()
+        .subtract(7, "days");
+      $("#dateRange").data("daterangepicker").setEndDate(endDate);
+      $("#dateRange")
+        .data("daterangepicker")
+        .setStartDate(startDate.clone().subtract(7, "days"));
+
+      refreshData(dateRange);
+    });
+
+    $("#adjustDateForward").on("click", function () {
+      var startDate = $("#dateRange").data("daterangepicker").startDate;
+      var endDate = $("#dateRange")
+        .data("daterangepicker")
+        .endDate.clone()
+        .add(7, "days");
+      $("#dateRange")
+        .data("daterangepicker")
+        .setStartDate(startDate.clone().add(7, "days"));
+      $("#dateRange").data("daterangepicker").setEndDate(endDate);
+
+      refreshData(dateRange);
+    });
+    //#endregion
   });
 </script>

@@ -24,7 +24,17 @@ module.exports = router;
 
 router.get("/load", (req, res) => {
   try {
-    let cmd = "select * from sims.order order by o_date desc";
+    let cmd = `
+    select 
+    o_id,
+    o_date,
+    c_fullname o_customerid,
+    o_details,
+    o_paymentmethod,
+    o_status
+    from sims.order
+    inner join customer on c_id = o_customerid
+    order by o_date desc`;
 
     Select(cmd, (error, result) => {
       if (error) {
@@ -49,7 +59,13 @@ router.get("/load", (req, res) => {
 
 router.post("/save", (req, res) => {
   try {
-    const { details, paymentmethod, customerid, storepoints } = req.body;
+    const {
+      details,
+      paymentmethod,
+      customerid,
+      storepoints,
+      verificationcode,
+    } = req.body;
     let status = StatusMessage.PND;
     let date = GetCurrentDatetime();
 
@@ -118,6 +134,9 @@ router.post("/save", (req, res) => {
                 ["points"],
                 ["id"]
               );
+
+              console.log(sql);
+
               let current_balance = parseFloat(storepoints) - total;
               console.log(current_balance, storepoints);
 
@@ -137,7 +156,7 @@ router.post("/save", (req, res) => {
               ]);
 
               let history_data = [
-                [customerid, GetCurrentDatetime(), storepoints, "Points Deducted"],
+                [customerid, GetCurrentDatetime(), total, "Points Deducted"],
               ];
 
               InsertTable(history, history_data, (err, result) => {
@@ -346,6 +365,138 @@ router.delete("/delete", (req, res) => {
       }
 
       res.status(200).send({ msg: "success" });
+    });
+  } catch (error) {
+    res.status(500).send({ msg: error });
+  }
+});
+
+router.get("/getorderdetails/:id", (req, res) => {
+  try {
+    const { id } = req.params;
+    let sql = SelectStatement("select * from sims.order where o_id = ?", [id]);
+    Select(sql, (error, result) => {
+      if (error) {
+        console.error(error);
+
+        return res.status(500).send({ msg: error });
+      }
+
+      let data = DataModeling(result, "o_");
+      let dataJson = JSON.parse(data[0].details);
+      console.log(dataJson);
+      let arrayJson = dataJson[0].cart;
+      let resultJson = [];
+
+      arrayJson.forEach((key, item) => {
+        const { id, name, price, quantity } = key;
+        console.log(id, name, price, quantity);
+        resultJson.push({
+          id: id,
+          name: name,
+          price: price,
+          quantity: quantity,
+        });
+      });
+
+      res.status(200).send({
+        msg: "success",
+        data: {
+          detail: [
+            {
+              total: dataJson[0].total,
+              payment: dataJson[0].payment,
+              address: dataJson[0].address,
+            },
+          ],
+          items: resultJson,
+        },
+      });
+    });
+  } catch (error) {
+    res.status(500).send({ msg: error });
+  }
+});
+
+router.post("/createverificationcode/", (req, res) => {
+  try {
+    const { customerid, amount } = req.body;
+    const randomNumber = Math.floor(100000 + Math.random() * 900000);
+    const date = GetCurrentDatetime();
+
+    let sql_check = SelectStatement(
+      "select c_email as email from customer where c_id=?",
+      [customerid]
+    );
+    Check(sql_check).then((result) => {
+      if (result.length != 0) {
+        let email = result[0].email;
+        let data = [
+          [customerid, date, randomNumber, amount, StatusMessage.PND],
+        ];
+        let cmd = InsertStatement("storepoint_verification", "sv", [
+          "customerid",
+          "date",
+          "code",
+          "amount",
+          "status",
+        ]);
+
+        InsertTable(cmd, data, (error, result) => {
+          if (error) {
+            console.error(error);
+            return res.status(500).send({ msg: error });
+          }
+
+          SendEmail(
+            `${email}`,
+            `Store Points Verification ${GetCurrentDatetime()}`,
+            `<p>Here is your verification code</p>
+            </br>
+            Code: <strong>${randomNumber}</strong> 
+            `
+          );
+
+          res.status(200).send({ msg: "success" });
+        });
+      } else {
+        res.status(200).send({ msg: "success" });
+      }
+    });
+  } catch (error) {
+    res.status(500).send({ msg: error });
+  }
+});
+
+router.post("/storepointverificationcode", (req, res) => {
+  try {
+    const { customerid, code } = req.body;
+    let sql_check = SelectStatement(
+      "select * from storepoint_verification where sv_customerid=? and sv_code=? and not sv_status=?",
+      [customerid, code, StatusMessage.CMP]
+    );
+
+    console.log(sql_check);
+
+    Check(sql_check).then((result) => {
+      if (result.length != 0) {
+        let data = [StatusMessage.CMP, customerid, code];
+        let updateStatement = UpdateStatement(
+          "storepoint_verification",
+          "sv",
+          ["status"],
+          ["customerid", "code"]
+        );
+
+        Update(updateStatement, data, (err, result) => {
+          if (err) console.error("Error: ", err);
+          console.log(result);
+        });
+
+        res.status(200).send({ msg: "success" });
+      } else {
+        res.status(200).send({ msg: "already in use" });
+      }
     });
   } catch (error) {
     res.status(500).send({ msg: error });

@@ -1,0 +1,129 @@
+<div class="card">
+  <div class="card-header">
+    <h6 class="card-title">Report</h6>
+    <div class="row mb-2 mt-2">
+      <div class="col-md-6">
+        <div class="input-group shadow">
+          <button
+            id="adjustDateBackward"
+            class="btn btn-outline-inventory custom-br-left"
+          >
+            <i class="fas fa-caret-left"></i>
+          </button>
+          <input
+            id="dateRange"
+            name="dateRange"
+            type="text"
+            class="form-control text-center daterange"
+            placeholder="Select Date Range"
+            aria-describedby="basic-addon1"
+            readonly
+          />
+          <button
+            id="adjustDateForward"
+            class="btn btn-outline-inventory custom-br-right"
+          >
+            <i class="fas fa-caret-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card shadow">
+        <div class="card-header p-0">
+          <ul class="nav nav-pills" id="sales-pills-tab" role="tablist">
+            <li class="nav-item sales-options text-center mb-1">
+              <a
+                class="sales-link active"
+                id="grosssales-option"
+                data-toggle="pill"
+                href="#sales-content"
+                role="tab"
+                aria-controls="grosssales-option"
+                aria-selected="true"
+              >
+                <span>Sales</span><br />
+              </a>
+            </li>
+            <li class="nav-item sales-options text-center mb-1">
+              <a
+                class="sales-link"
+                id="report-option"
+                data-toggle="pill"
+                href="#report-content"
+                role="tab"
+                aria-controls="report-option"
+                aria-selected="false"
+              >
+                <span>Reports</span><br />
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card-body p-3">
+          <div class="tab-content" id="sales-tab-contents">
+            <div
+              class="tab-pane show active"
+              id="sales-content"
+              role="tabpanel"
+              aria-labelledby="grosssales-option"
+            >
+              <div class="card shadow scroll-cardbody-size-710">
+                <div class="card-body sales-details-height">
+                  <div class="row justify-content-center">
+                    <div class="col">
+                      <span class="h5"> Sales Graph </span>
+                    </div>
+                  </div>
+                  <div id="sales-graph-loader"></div>
+
+                  <div class="row" style="height: 480px">
+                    <canvas class="py-2" id="gross-sales-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="tab-pane show active"
+              id="report-content"
+              role="tabpanel"
+              aria-labelledby="report-option"
+            >
+              <div class="card shadow scroll-cardbody-size-710">
+                <div class="card-header">
+                  <span class="h5"> Sales Report </span>
+                </div>
+                <div class="card-body sales-details-height">
+                  <div class="row">
+                    <div
+                      class="table-responsive scroll-cardbody-size-sm border"
+                    >
+                      <table
+                        class="table table-bordered custom-mobile-table"
+                        id="top-selling-products-table"
+                        cellspacing="10"
+                      >
+                        <thead>
+                          <tr>
+                            <th class="col-3 text-left">Product</th>
+                            <th class="col-3 text-left">Price</th>
+                            <th class="col-3 text-left">Quantity</th>
+                            <th class="col-3 text-left">Total</th>
+                          </tr>
+                        </thead>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div class="row justify-content-center"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

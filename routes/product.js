@@ -222,3 +222,43 @@ router.get("/getproductinventory", (req, res) => {
     });
   }
 });
+
+router.get("/stockload", (req, res) => {
+  try {
+    let cmd = `
+          select 
+          p_id,
+          p_name,
+          p_image,
+          p_price,
+          c_name as p_category,
+          p_isinventory,
+          p_status ,
+          i_stock
+          from product 
+          inner join category on p_category = c_id
+          left join inventory on i_productid = p_id
+          where i_stock > 1
+          OR p_isinventory = 'False'`;
+
+    Select(cmd, (error, result) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).send({ msg: error });
+      }
+
+      if (result.length != 0) {
+        let data = DataModeling(result, "p_");
+
+        return res.status(200).send({ msg: "success", data: data });
+      } else {
+        return res.status(200).send({ msg: "success", data: result });
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({
+      msg: error,
+    });
+  }
+});
