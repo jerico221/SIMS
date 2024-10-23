@@ -24,7 +24,17 @@ module.exports = router;
 
 router.get("/load", (req, res) => {
   try {
-    let cmd = "select * from sims.order order by o_date desc";
+    let cmd = `
+    select 
+    o_id,
+    o_date,
+    c_fullname o_customerid,
+    o_details,
+    o_paymentmethod,
+    o_status
+    from sims.order
+    inner join customer on c_id = o_customerid
+    order by o_date desc`;
 
     Select(cmd, (error, result) => {
       if (error) {
