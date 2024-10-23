@@ -253,6 +253,7 @@
           let address = "";
           let order = "";
           let orderlist = "";
+          let total = "";
           if (item.status === "PENDING") {
             action = `
               <span class="editbutton mr-2" id="viewBtn" name="viewBtn" data-toggle="modal" data-target="#viewModal"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>
@@ -276,6 +277,7 @@
             location = item.location;
             address = item.address;
             order = item.cart;
+            total = item.total;
           });
 
           order.forEach((item) => {
@@ -301,7 +303,7 @@
             }),
 
             $("<td>", {
-              text: item.paymentmethod,
+              text: `${item.paymentmethod} - ${formatCurrency(total)}`,
               "data-label": "paymentmethod",
               class: "custom-mobile-align",
             }),
