@@ -18,7 +18,9 @@ module.exports = router;
 let pdfBuffer = "";
 
 router.post("/generatepdf", (req, res) => {
+  try {
     const { detailsdata, overalltotal, daterange } = req.body;
+
     let headerConstant = ["Product", "Price", "Quantity", "Total"];
     let header = PDFTableHeaderFormatter(headerConstant);
 
