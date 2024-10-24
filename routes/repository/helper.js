@@ -161,7 +161,8 @@ exports.PDFTemplateFormatter = (
   header,
   details,
   tablewidth,
-  overalltotal
+  overalltotal,
+  daterange
 ) => {
   let tablecontent = [];
 
@@ -192,7 +193,7 @@ exports.PDFTemplateFormatter = (
           body: [
             [
               {
-                text: "Date: " + this.GetCurrentDate(),
+                text: `Date: ${daterange}`,
                 margin: [0, 1, 0, 0],
               },
             ],
@@ -339,8 +340,6 @@ exports.PDFContentFormatter = (data = []) => {
     let content = [];
 
     for (const i in item) {
-      console.log(typeof item[i]);
-
       content.push({
         text: item[i] === typeof Float32Array ? item[i].toFixed(2) : item[i],
         style: "tablecontent",

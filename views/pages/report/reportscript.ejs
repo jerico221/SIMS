@@ -13,7 +13,11 @@
         Upsert(
           "POST",
           "/pdf/generatepdf",
-          { detailsdata: result.data, overalltotal: result.overalltotal },
+          {
+            detailsdata: result.data,
+            overalltotal: result.overalltotal,
+            daterange: formattedDate,
+          },
           function (result) {
             window.open(`/pdf/generatepdf/Test`, "_blank");
           }

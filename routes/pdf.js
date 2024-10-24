@@ -21,7 +21,7 @@ router.post("/generatepdf", (req, res) => {
   try {
     console.log("Clicked");
 
-    const { detailsdata, overalltotal } = req.body;
+    const { detailsdata, overalltotal, daterange } = req.body;
 
     console.log(detailsdata);
     let headerConstant = ["Product", "Price", "Quantity", "Total"];
@@ -63,7 +63,8 @@ router.post("/generatepdf", (req, res) => {
         header,
         details,
         tablewitdh,
-        overalltotal
+        overalltotal,
+        daterange
       )
     )
       .then((result) => {
