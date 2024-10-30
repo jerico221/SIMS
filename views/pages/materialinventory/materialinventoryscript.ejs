@@ -66,6 +66,77 @@
 
     $(document).on("click", "#editBtn", function () {
       $("#idmodal").val(id);
+      $("#materialmodal").val("");
+      $("#unitmodal").val("-");
+      $("#costmodal").val("");
+    });
+
+    $(document).on("click", "#replenishBtn", function () {
+      $("#idstockmodal").val(id);
+      $("#stocksmodal").val("");
+    });
+
+    $(document).on("click", "#updateBtn", function () {
+      let material = $("#materialmodal").val();
+      let unit = $("#unitmodal").val();
+      let price = $("#costmodal").val();
+      let message = "";
+
+      console.log(material, unit, price);
+
+      if (material == "" && unit == "-" && price == "") {
+        message += "Please fill up at least one field";
+      }
+
+      if (message != "") {
+        warning("Required", message);
+      } else {
+        Upsert(
+          "POST",
+          "/materialinventory/update",
+          {
+            id: id,
+            material: material,
+            unit: unit,
+            price: RemoveCurrencyFormatting(price),
+          },
+          function (result) {
+            if (result.msg == "success") {
+              $("#editModal").modal("hide");
+              LoadTable();
+              success("Success", "New inventory successfully updated!");
+            }
+            console.log(result);
+          }
+        );
+      }
+    });
+
+    $(document).on("click", "#updateStockBtn", function () {
+      let quantity = $("#stocksmodal").val();
+      let message = "";
+
+      if (quantity == "") {
+        message += "Quantity is required";
+      }
+
+      if (message != "") {
+        warning("Required", message);
+      } else {
+        Upsert(
+          "POST",
+          "/materialinventory/update",
+          { id: id, quantity: quantity },
+          function (result) {
+            if (result.msg == "success") {
+              $("#replenishmentModal").modal("hide");
+              LoadTable();
+              success("Success", "New inventory successfully updated!");
+            }
+            console.log(result);
+          }
+        );
+      }
     });
 
     function LoadTable() {

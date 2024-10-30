@@ -147,250 +147,234 @@
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Update Info Modal -->
-  <div
-    class="modal fade"
-    id="editModal"
-    tabindex="-1"
-    role="dialog"
-    aria-labelledby="exampleModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header custom-bg">
-          <h5 class="modal-title" id="exampleModalLabel">
-            Material/Ingridients
-          </h5>
-          <button
-            type="button"
-            class="close"
-            data-dismiss="modal"
-            aria-label="Close"
-          >
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="custom-modal-body">
-          <div class="card">
-            <div class="card-header py-2 header-bg">
-              <h6 class="m-0 font-weight-bold table-title">
-                Update Material/Ingridients:
-              </h6>
+<!-- Update Info Modal -->
+<div
+  class="modal fade"
+  id="editModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header custom-bg">
+        <h5 class="modal-title" id="exampleModalLabel">Material/Ingridients</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="custom-modal-body">
+        <div class="card">
+          <div class="card-header py-2 header-bg">
+            <h6 class="m-0 font-weight-bold table-title">
+              Update Material/Ingridients:
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="row mb-2 justify-content-center">
+              <div class="col-md-6">
+                <div class="input-group mb-3">
+                  <input
+                    autocomplete="off"
+                    id="idmodal"
+                    name="idmodal"
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter new idmodal"
+                    aria-label="idmodal"
+                    aria-describedby="basic-addon1"
+                    disabled
+                  />
+                  <div class="input-group-append">
+                    <span class="input-group-text">ID</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="card-body">
-              <div class="row mb-2 justify-content-center">
-                <div class="col-md-6">
-                  <div class="input-group mb-3">
-                    <input
-                      autocomplete="off"
-                      id="idmodal"
-                      name="idmodal"
-                      type="text"
-                      class="form-control"
-                      placeholder="Enter new idmodal"
-                      aria-label="idmodal"
-                      aria-describedby="basic-addon1"
-                      disabled
-                    />
-                    <div class="input-group-append">
-                      <span class="input-group-text">ID</span>
-                    </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="input-group mb-3">
+                  <div class="input-group-append">
+                    <span class="input-group-text">Material/Ingridient</span>
                   </div>
+                  <input
+                    autocomplete="off"
+                    id="materialmodal"
+                    name="materialmodal"
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter New Material Name"
+                    aria-label="materialmodal"
+                    aria-describedby="basic-addon1"
+                  />
                 </div>
               </div>
 
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="input-group mb-3">
-                    <div class="input-group-append">
-                      <span class="input-group-text">Material/Ingridient</span>
-                    </div>
-                    <input
-                      autocomplete="off"
-                      id="materialmodal"
-                      name="materialmodal"
-                      type="text"
-                      class="form-control"
-                      placeholder="Enter New Material Name"
-                      aria-label="materialmodal"
-                      aria-describedby="basic-addon1"
-                    />
+              <div class="col-md-6">
+                <div class="input-group mb-3">
+                  <div class="input-group-append">
+                    <span class="input-group-text">Unit</span>
                   </div>
-                </div>
-
-                <div class="col-md-6">
-                  <div class="input-group mb-3">
-                    <div class="input-group-append">
-                      <span class="input-group-text">Unit</span>
-                    </div>
-                    <select
-                      name="unitmodal"
-                      id="unitmodal"
-                      class="form-control"
-                    >
-                      <option value="-">Select Unit</option>
-                      <option value="pcs">Piece/s</option>
-                      <option value="g">Grams</option>
-                      <option value="kg">Kilograms</option>
-                      <option value="L">Litre</option>
-                      <option value="ml">Mililitre</option>
-                    </select>
-                  </div>
+                  <select name="unitmodal" id="unitmodal" class="form-control">
+                    <option value="-">Select Unit</option>
+                    <option value="pcs">Piece/s</option>
+                    <option value="g">Grams</option>
+                    <option value="kg">Kilograms</option>
+                    <option value="L">Litre</option>
+                    <option value="ml">Mililitre</option>
+                  </select>
                 </div>
               </div>
+            </div>
 
-              <div class="row justify-content-center">
-                <div class="col-md-6">
-                  <div class="input-group mb-3">
-                    <div class="input-group-append">
-                      <span class="input-group-text">Price</span>
-                    </div>
-                    <input
-                      autocomplete="off"
-                      id="costmodal"
-                      name="costmodal"
-                      type="text"
-                      class="form-control"
-                      placeholder="Enter New Cost"
-                      aria-label="costmodal"
-                      aria-describedby="basic-addon1"
-                      oninput="formatPrice(event, this)"
-                    />
+            <div class="row justify-content-center">
+              <div class="col-md-6">
+                <div class="input-group mb-3">
+                  <div class="input-group-append">
+                    <span class="input-group-text">Price</span>
                   </div>
+                  <input
+                    autocomplete="off"
+                    id="costmodal"
+                    name="costmodal"
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter New Cost"
+                    aria-label="costmodal"
+                    aria-describedby="basic-addon1"
+                    oninput="formatPrice(event, this)"
+                  />
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="modal-footer">
-          <button
-            type="button"
-            id="closeBtn"
-            class="btn btn-outline-inventory"
-            data-dismiss="modal"
-          >
-            Close
-          </button>
-          <button
-            type="button"
-            id="updateBtn"
-            class="btn btn-outline-inventory"
-          >
-            <span id="btn-label-modal">Update</span>
-            <span
-              id="btnSpinner-modal"
-              class="spinner-border spinner-border-sm d-none"
-              role="status"
-              aria-hidden="true"
-            ></span>
-          </button>
-        </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          id="closeBtn"
+          class="btn btn-outline-inventory"
+          data-dismiss="modal"
+        >
+          Close
+        </button>
+        <button type="button" id="updateBtn" class="btn btn-outline-inventory">
+          <span id="btn-label-modal">Update</span>
+          <span
+            id="btnSpinner-modal"
+            class="spinner-border spinner-border-sm d-none"
+            role="status"
+            aria-hidden="true"
+          ></span>
+        </button>
       </div>
     </div>
   </div>
+</div>
 
-  <!--Replenishment Modal -->
-  <div
-    class="modal fade"
-    id="replenishmentModal"
-    tabindex="-1"
-    role="dialog"
-    aria-labelledby="exampleModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header custom-bg">
-          <h5 class="modal-title" id="exampleModalLabel">
-            Material/Ingridients
-          </h5>
-          <button
-            type="button"
-            class="close"
-            data-dismiss="modal"
-            aria-label="Close"
-          >
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="custom-modal-body">
-          <div class="card">
-            <div class="card-header py-2 header-bg">
-              <h6 class="m-0 font-weight-bold table-title">
-                Update Material/Ingridients:
-              </h6>
-            </div>
-            <div class="card-body">
-              <div class="row mb-2 justify-content-center">
-                <div class="col-md-6">
-                  <div class="input-group mb-3">
-                    <input
-                      autocomplete="off"
-                      id="idmodal"
-                      name="idmodal"
-                      type="text"
-                      class="form-control"
-                      placeholder="Enter new idmodal"
-                      aria-label="idmodal"
-                      aria-describedby="basic-addon1"
-                      disabled
-                    />
-                    <div class="input-group-append">
-                      <span class="input-group-text">ID</span>
-                    </div>
+<!--Replenishment Modal -->
+<div
+  class="modal fade"
+  id="replenishmentModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header custom-bg">
+        <h5 class="modal-title" id="exampleModalLabel">Material/Ingridients</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="custom-modal-body">
+        <div class="card">
+          <div class="card-header py-2 header-bg">
+            <h6 class="m-0 font-weight-bold table-title">
+              Update Material/Ingridients:
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="row mb-2 justify-content-center">
+              <div class="col-md-6">
+                <div class="input-group mb-3">
+                  <input
+                    autocomplete="off"
+                    id="idstockmodal"
+                    name="idstockmodal"
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter ID"
+                    aria-label="idstockmodal"
+                    aria-describedby="basic-addon1"
+                    disabled
+                  />
+                  <div class="input-group-append">
+                    <span class="input-group-text">ID</span>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <div class="row justify-content-center">
-                <div class="col-md-6">
-                  <div class="input-group mb-3">
-                    <div class="input-group-append">
-                      <span class="input-group-text">Product Name</span>
-                    </div>
-                    <input
-                      autocomplete="off"
-                      id="stocksmodal"
-                      name="stocksmodal"
-                      type="text"
-                      class="form-control"
-                      placeholder="Replenish Stocks"
-                      aria-label="stocksmodal"
-                      aria-describedby="basic-addon1"
-                    />
+            <div class="row justify-content-center">
+              <div class="col-md-6">
+                <div class="input-group mb-3">
+                  <div class="input-group-append">
+                    <span class="input-group-text">Quantity</span>
                   </div>
+                  <input
+                    autocomplete="off"
+                    id="stocksmodal"
+                    name="stocksmodal"
+                    type="number"
+                    class="form-control"
+                    placeholder="Enter new quantity"
+                    aria-label="stocksmodal"
+                    aria-describedby="basic-addon1"
+                  />
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="modal-footer">
-          <button
-            type="button"
-            id="closeBtn"
-            class="btn btn-outline-inventory"
-            data-dismiss="modal"
-          >
-            Close
-          </button>
-          <button
-            type="button"
-            id="updateBtn"
-            class="btn btn-outline-inventory"
-          >
-            <span id="btn-label-modal">Update</span>
-            <span
-              id="btnSpinner-modal"
-              class="spinner-border spinner-border-sm d-none"
-              role="status"
-              aria-hidden="true"
-            ></span>
-          </button>
-        </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          id="closeBtn"
+          class="btn btn-outline-inventory"
+          data-dismiss="modal"
+        >
+          Close
+        </button>
+        <button type="button" id="updateStockBtn" class="btn btn-outline-inventory">
+          <span id="btn-label-modal">Update</span>
+          <span
+            id="btnSpinner-modal"
+            class="spinner-border spinner-border-sm d-none"
+            role="status"
+            aria-hidden="true"
+          ></span>
+        </button>
       </div>
     </div>
   </div>

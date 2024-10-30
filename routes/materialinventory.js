@@ -83,3 +83,58 @@ router.post("/save", (req, res) => {
     res.status(500).send({ msg: error });
   }
 });
+
+router.post("/update", (req, res) => {
+  try {
+    const { id, material, unit, price, quantity } = req.body;
+    let material_inventory_data = [];
+    let material_inventory_columns = [];
+    let material_inventory_args = [];
+
+    console.log(unit);
+
+    if (material) {
+      material_inventory_data.push(material);
+      material_inventory_columns.push("name");
+    }
+
+    if (quantity) {
+      material_inventory_data.push(quantity);
+      material_inventory_columns.push("stock");
+    }
+
+    if (unit != "-") {
+      if (unit == undefined) {
+      } else {
+        material_inventory_data.push(unit);
+        material_inventory_columns.push("unit");
+      }
+    }
+
+    if (price) {
+      material_inventory_data.push(price);
+      material_inventory_columns.push("cost");
+    }
+
+    material_inventory_data.push(id);
+    material_inventory_args.push("id");
+
+    let material_inventory = UpdateStatement(
+      "material_inventory",
+      "mi",
+      material_inventory_columns,
+      material_inventory_args
+    );
+
+    Update(material_inventory, material_inventory_data, (error, result) => {
+      if (error) {
+        console.log(error);
+        return res.status(500).send({ msg: error });
+      } else {
+        return res.status(200).send({ msg: "success" });
+      }
+    });
+  } catch (error) {
+    res.status(500).send({ msg: error });
+  }
+});
