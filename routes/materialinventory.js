@@ -138,3 +138,29 @@ router.post("/update", (req, res) => {
     res.status(500).send({ msg: error });
   }
 });
+
+router.get("/getmaterial/:id", (req, res) => {
+  try {
+    const { id } = req.params;
+    let sql = SelectStatement(
+      "select * from material_inventory where mi_id=?",
+      [id]
+    );
+
+    Select(sql, (error, result) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).send({ msg: error });
+      }
+
+      if (result.length != 0) {
+        let data = DataModeling(result, "mi_");
+        return res.status(200).send({ msg: "success", data: data });
+      } else {
+        return res.status(200).send({ msg: "success", data: result });
+      }
+    });
+  } catch (error) {
+    res.status(500).send({ msg: error });
+  }
+});

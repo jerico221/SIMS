@@ -60,6 +60,9 @@ const roleacess = [
       {
         layout: "materialinventorylayout",
       },
+      {
+        layout: "componentslayout",
+      },
     ],
     //#endregion
   },

@@ -1,0 +1,300 @@
+<script>
+  $(document).ready(function () {
+    let id = "";
+    let existingData = [];
+    let totalCost = 0;
+
+    $("#datatable-component tbody").on("click", "tr", function () {
+      var dataRow = [];
+      $(this)
+        .closest("tr")
+        .find("td")
+        .each(function () {
+          dataRow.push(
+            $(this).text() == "" ? $(this).find("input").val() : $(this).text()
+          );
+        });
+
+      console.log(dataRow);
+
+      id = dataRow[0];
+    });
+
+    $(document).on("click", "#addBtn", function () {
+      let materialname = $("#material").val();
+      let materialID = $("#materialID").val();
+      let unitmodal = $("#unitmodal").val();
+      let quantity = $("#quantity").val();
+
+      if (!existingData.some((item) => item.materialname === materialname)) {
+        existingData.push({
+          materialname: materialname,
+          materialID: materialID,
+          unitmodal: unitmodal,
+          quantity: quantity,
+        });
+
+        Fetch(`/materialinventory/getmaterial/${materialID}`, (result) => {
+          if (result.msg === "success") {
+            let data = result.data;
+            console.log(data);
+            if (data.length != 0) {
+              let cost = data[0].cost;
+
+              // $("#price").val(formatCurrency(parseFloat(cost)));
+              const tr = $("<tr>").append(
+                $("<td>", {
+                  text: materialID,
+                  "data-label": "Material ID",
+                  class: "custom-mobile-align",
+                }),
+                $("<td>", {
+                  text: materialname,
+                  "data-label": "Material Name",
+                  class: "custom-mobile-align",
+                }),
+                $("<td>", {
+                  text: unitmodal,
+                  "data-label": "Unit(Deduct)",
+                  class: "custom-mobile-align",
+                }),
+                $("<td>", {
+                  text: formatCurrency(parseFloat(cost) * parseFloat(quantity)),
+                  "data-label": "Cost",
+                  class: "custom-mobile-align",
+                }),
+                $("<td>", {
+                  html: `<input type="text" class="text-center form-control quantity" value="${quantity}">`,
+                  "data-label": "Quantity",
+                  class: "custom-mobile-align",
+                }),
+                $("<td>", {
+                  html: `<span class="editbutton removeBtn"><i class="fas fa-trash" style="color: rgb(99, 115, 129);"></i></span>`,
+                  "data-label": "Action",
+                  class: "actionWidth",
+                })
+              );
+
+              // let newRow = `
+              //         <tr>
+              //           <td>${materialID}</td>
+              //           <td>${materialname}</td>
+              //           <td>${unitmodal}</td>
+              //           <td>${formatCurrency(
+              //             parseFloat(quantity) * parseFloat(cost)
+              //           )}</td>
+              //           <td><input type="text" class="text-center form-control quantity" value="${quantity}"></td>
+              //           <td>
+              //             <span class="editbutton removeBtn"><i class="fas fa-trash" style="color: rgb(99, 115, 129);"></i></span>
+              //           </td>
+              //         </tr>
+              //       `;
+
+              $("#datatable-component tbody").append(tr);
+
+              TotalCost();
+            }
+          } else {
+            console.error(result.msg);
+          }
+        });
+      } else {
+        return toastr.warning("Material already exists");
+      }
+    });
+
+    $(document).on("click", ".removeBtn", function () {
+      $(this).closest("tr").remove();
+      existingData = existingData.filter(
+        (item) =>
+          item.materialname !== $(this).closest("tr").find("td:eq(0)").text()
+      );
+
+      TotalCost();
+    });
+
+    $(document).on("input", ".quantity", function () {
+      let quantity = $(this).val();
+      let materialID = $(this).closest("tr").find("td:eq(0)").text();
+      let materialname = $(this).closest("tr").find("td:eq(1)").text();
+      let unitmodal = $(this).closest("tr").find("td:eq(2)").text();
+
+      Fetch(`/materialinventory/getmaterial/${materialID}`, (result) => {
+        if (result.msg === "success") {
+          let data = result.data;
+          console.log(data);
+          if (data.length != 0) {
+            let cost = data[0].cost;
+            // $("#price").val(formatCurrency(parseFloat(cost)));
+            $(this)
+              .closest("tr")
+              .find("td:eq(3)")
+              .text(formatCurrency(parseFloat(quantity) * parseFloat(cost)));
+            TotalCost();
+          }
+        } else {
+          console.error(result.msg);
+        }
+      });
+    });
+
+    $(document).on("click", "#submitBtn", function () {
+      let product = $("#product").val();
+      let productID = $("#productID").val();
+      let components = [];
+      let message = "";
+
+      if (productID == "") {
+        message = "Please select a product";
+        toastr.warning(message, "Product Components");
+        return;
+      }
+
+      if ($("#datatable-component tbody tr").length == 0) {
+        message = "Please add components";
+        toastr.warning(message, "Product Components");
+        return;
+      }
+
+      $("#datatable-component tbody tr").each(function () {
+        let materialID = $(this).find("td:eq(0)").text();
+        let quantity = $(this).find("input").val();
+        let cost = $(this).find("td:eq(3)").text();
+
+        components.push({
+          materialID: materialID,
+          quantity: quantity,
+          cost: RemoveCurrencyFormatting(cost),
+        });
+      });
+
+      Upsert(
+        "POST",
+        "/components/save",
+        {
+          productid: productID,
+          details: JSON.stringify(components),
+          cost: RemoveCurrencyFormatting($("#cost").val()),
+        },
+        (result) => {
+          if (result.msg === "success") {
+            toastr.success("Successfully", "Product Components");
+            $("#product").val("");
+            $("#productID").val("");
+            $("#datatable-component tbody").empty();
+            $("#cost").val("");
+            existingData = [];
+            totalCost = 0;
+            LoadTable();
+          } else {
+            toastr.warning("Profuct has already exist", "Product Components");
+            console.error(result.msg);
+          }
+        }
+      );
+    });
+
+    function LoadTable() {
+      Fetch("/components/load", (result) => {
+        if (result.msg === "success") {
+          populatedatatable(result.data);
+        } else {
+          console.error(result.msg);
+        }
+      });
+    }
+
+    function populatedatatable(data) {
+      console.log(data);
+      const tableBody = $("#datatable tbody");
+      tableBody.empty();
+
+      if (data.length === 0) {
+        const tr = $("<tr>").append(
+          $("<td>", {
+            colspan: 6,
+            class: "text-center",
+            text: "No Data Matched",
+          })
+        );
+        tableBody.append(tr);
+      } else {
+        data.forEach((item) => {
+          const tr = $("<tr>").append(
+            $("<td>", {
+              text: item.id,
+              "data-label": "ID",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.productid,
+              "data-label": "Product",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              html: `<span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+              <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>`,
+              "data-label": "Action",
+              class: "actionWidth",
+            })
+          );
+
+          tableBody.append(tr);
+        });
+      }
+    }
+
+    function LoadList() {
+      Fetch("/product/load", (result) => {
+        let activeData = [];
+        let dropdownID = "productDropdown";
+        let inputID = "product";
+        let hiddenID = "productID";
+        let container = result.data;
+        //console.log(container)
+        $.each(container, (key, item) => {
+          let name = item.name;
+          let id = item.id;
+          activeData.push({
+            display: name,
+            value: id,
+          });
+        });
+
+        AddDropdownData(dropdownID, activeData, inputID, hiddenID);
+      });
+
+      Fetch("/materialinventory/load", (result) => {
+        let activeData = [];
+        let dropdownID = "materialDropdown";
+        let inputID = "material";
+        let hiddenID = "materialID";
+        let container = result.data;
+        //console.log(container)
+        $.each(container, (key, item) => {
+          let name = item.name;
+          let id = item.id;
+          activeData.push({
+            display: name,
+            value: id,
+          });
+        });
+
+        AddDropdownData(dropdownID, activeData, inputID, hiddenID);
+      });
+    }
+
+    function TotalCost() {
+      let total = 0;
+      $("#datatable-component tbody tr").each(function () {
+        let cost = $(this).find("td:eq(3)").text();
+        total += parseFloat(RemoveCurrencyFormatting(cost));
+        console.log(total);
+      });
+      $("#cost").val(formatCurrency(total));
+    }
+
+    LoadList();
+    LoadTable();
+  });
+</script>
