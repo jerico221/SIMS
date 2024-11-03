@@ -24,8 +24,7 @@
         (result) => {
           if (result.msg === "success") {
             toastr.success("Production added successfully", "Production");
-            $("#datatable-production tbody").empty();
-            LoadList();
+            LoadTable();
           } else {
             console.error(result.msg);
           }
@@ -115,6 +114,39 @@
       });
     });
 
+    $(document).on("click", "#doneBtn", function () {
+      let id = $(this).closest("tr").find("td:eq(0)").text();
+
+      Upsert(
+        "PUT",
+        `/production/approve`,
+        { id: id},
+        (result) => {
+          if (result.msg === "success") {
+            toastr.success("Production approved", "Production");
+            LoadTable();
+          } else {
+            console.error(result.msg);
+          }
+        }
+      );
+    });
+
+    // $(document).on("click", "#cancelBtn", function () {
+    //   let id = $(this).closest("tr").find("td:eq(0)").text();
+    //   let status = StatusMessage.INACT;
+
+    //   Upsert("PUT", `/production/approve/${id}`, { id: id }, (result) => {
+    //     if (result.msg === "success") {
+    //       toastr.success("Production canceled", "Production");
+    //       $("#datatable-production tbody").empty();
+    //       LoadList();
+    //     } else {
+    //       console.error(result.msg);
+    //     }
+    //   });
+    // });
+
     function LoadList() {
       Fetch("/components/getproductcomponents", (result) => {
         let activeData = [];
@@ -162,10 +194,25 @@
         tableBody.append(tr);
       } else {
         data.forEach((item) => {
+          let action = "";
+
+          if (item.status == "IN PROGRESS") {
+            action = `<span class="editbutton" id="doneBtn" name="doneBtn"><i class="fas fa-check" style="color: rgb(99, 115, 129);"></i></span>
+              <span class="editbutton" id="cancelBtn" name="cancelBtn"><i class="fas fa-times" style="color: rgb(99, 115, 129);"></i></span>`;
+          }
+
+          const statusBackground = getStatusBackground(item.status);
+          const containerBackground = getContainerBackground(item.status);
+
           const tr = $("<tr>").append(
             $("<td>", {
               text: item.id,
               "data-label": "ID",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.date,
+              "data-label": "Date",
               class: "custom-mobile-align",
             }),
             $("<td>", {
@@ -180,14 +227,16 @@
             }),
 
             $("<td>", {
-              text: item.status,
-              "data-label": "Quantity",
               class: "custom-mobile-align",
-            }),
+              "data-label": "Status",
+            }).append(
+              $("<div>", { class: containerBackground }).append(
+                $("<span>", { text: item.status, class: statusBackground })
+              )
+            ),
 
             $("<td>", {
-              html: `<span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
-              <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>`,
+              html: action,
               "data-label": "Action",
               class: "actionWidth",
             })

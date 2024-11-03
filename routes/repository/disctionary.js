@@ -12,6 +12,10 @@ const StatusMessage = {
   REC: "RECEIVED",
   FAIL: "FAIL",
   SUCCESS: "SUCCESS",
+  APD: "APPROVED",
+  ONG: "ONGOING",
+  INPR: "IN PROGRESS",
+  CANC: "CANCELLED",
 };
 
 module.exports = {
