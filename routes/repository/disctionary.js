@@ -10,6 +10,8 @@ const StatusMessage = {
   FDLV: "FOR DELIVERY",
   SND: "SENT",
   REC: "RECEIVED",
+  FAIL: "FAIL",
+  SUCCESS: "SUCCESS",
 };
 
 module.exports = {

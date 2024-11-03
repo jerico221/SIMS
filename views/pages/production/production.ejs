@@ -1,0 +1,131 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card shadow cardbody-size-710">
+        <div class="card-header py-3 header-bg">
+          <h6 class="mt-2 ml-3 font-weight-bold h4 label-title">Production</h6>
+        </div>
+
+        <table
+          id="datatable-production"
+          class="table table-bordered custom-mobile-table"
+          width="100%"
+          cellspacing="10"
+        >
+          <thead class="table-header">
+            <tr>
+              <th>ID</th>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow cardbody-size-710">
+        <div class="progress progress-sm mb-2">
+          <div
+            class="progress-bar"
+            role="progressbar"
+            style="width: 0%"
+            aria-valuenow="0"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          ></div>
+        </div>
+
+        <div class="card-header py-3 header-bg">
+          <h6 class="mt-2 ml-3 font-weight-bold h4 label-title">
+            Select Product
+          </h6>
+          <div class="row mt-2">
+            <div class="col">
+              <div class="input-group">
+                <input
+                  id="product"
+                  name="product"
+                  type="text"
+                  class="form-control"
+                  placeholder="Select or Input Product"
+                  aria-label="Select Product"
+                  autocomplete="off"
+                />
+                <input
+                  autocomplete="off"
+                  type="hidden"
+                  id="productID"
+                  name="productID"
+                />
+                <div class="input-group-append">
+                  <span class="input-group-text">Product</span>
+                </div>
+              </div>
+              <div
+                class="custom-dropdown cdw-tableoption"
+                id="productDropdown"
+              ></div>
+              <div>
+                <span>Max Production Quantity: </span>
+                <span id="maxProductionQuantity"></span>
+              </div>
+            </div>
+
+            <div class="col">
+              <div class="input-group">
+                <input
+                  autocomplete="off"
+                  type="number"
+                  class="form-control"
+                  id="quantity"
+                  placeholder="Enter Quantity"
+                  aria-label="Quantity"
+                  aria-describedby="addBtn"
+                />
+                <div class="input-group-append">
+                  <span class="input-group-text">Quantity</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col">
+              <button
+                class="btn btn-sm btn-outline-inventory w-100"
+                type="button"
+                id="addBtn"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <h6 class="m-0 font-weight-bold mt-2 label-title h4">
+          Product Components
+        </h6>
+        <div class="table-responsive scroll-cardbody-size-710 border">
+          <table
+            id="datatable-components"
+            class="table table-bordered custom-mobile-table"
+            width="100%"
+            cellspacing="10"
+          >
+            <thead class="table-header">
+              <tr>
+                <th>Material ID</th>
+                <th>Material Name</th>
+                <th>Unit(Deduct)</th>
+                <th>Stock</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

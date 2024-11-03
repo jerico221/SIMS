@@ -158,12 +158,16 @@
 
       $("#datatable-component tbody tr").each(function () {
         let materialID = $(this).find("td:eq(0)").text();
+        let materialname = $(this).find("td:eq(1)").text();
         let quantity = $(this).find("input").val();
+        let unit = $(this).find("td:eq(2)").text();
         let cost = $(this).find("td:eq(3)").text();
 
         components.push({
           materialID: materialID,
+          materialname: materialname,
           quantity: quantity,
+          unit: unit,
           cost: RemoveCurrencyFormatting(cost),
         });
       });

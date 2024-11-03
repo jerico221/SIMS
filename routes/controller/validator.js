@@ -63,6 +63,9 @@ const roleacess = [
       {
         layout: "componentslayout",
       },
+      {
+        layout: "productionlayout",
+      },
     ],
     //#endregion
   },

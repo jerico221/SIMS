@@ -28,7 +28,7 @@ router.get("/load", (req, res) => {
     select 
     o_id,
     o_date,
-    c_fullname o_customerid,
+    o_customerid,
     o_details,
     o_paymentmethod,
     o_status
@@ -509,6 +509,8 @@ async function GetCustomerEmail(customerid) {
       customerid,
     ]);
 
+    console.log(cmd);
+
     Select(cmd, (error, result) => {
       if (error) {
         console.error(error);
@@ -517,6 +519,9 @@ async function GetCustomerEmail(customerid) {
 
       if (result.length != 0) {
         let data = DataModeling(result, "c_");
+
+        console.log(data);
+
         resolve(data);
       } else {
         resolve(result);

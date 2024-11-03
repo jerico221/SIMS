@@ -1,0 +1,203 @@
+<script>
+  $(document).ready(function () {
+    $(document).on("click", "#addBtn", function () {
+      let quantity = $("#quantity").val();
+      let productID = $("#productID").val();
+      let message = "";
+
+      if (quantity == "") {
+        message = "Please enter quantity";
+        toastr.warning(message, "Production");
+        return;
+      }
+
+      if (productID == "") {
+        message = "Please select a product";
+        toastr.warning(message, "Production");
+        return;
+      }
+
+      Upsert(
+        "POST",
+        `/production/addproduction`,
+        { productID: productID, quantityProduction: quantity },
+        (result) => {
+          if (result.msg === "success") {
+            toastr.success("Production added successfully", "Production");
+            $("#datatable-production tbody").empty();
+            LoadList();
+          } else {
+            console.error(result.msg);
+          }
+        }
+      );
+    });
+
+    $(document).on("input", "#quantity", function () {
+      let quantity = $("#quantity").val();
+      let maxquantity = $("#maxProductionQuantity").html();
+
+      console.log(quantity, maxquantity);
+
+      if (parseFloat(quantity) > parseFloat(maxquantity)) {
+        toastr.warning(
+          "Quantity cannot be greater than " + maxquantity,
+          "Production"
+        );
+        $("#quantity").val(maxquantity);
+      }
+    });
+
+    $(document).on("click", "#productDropdown", function () {
+      console.log("clicked");
+      let productID = $("#productID").val();
+      let components = [];
+      let message = "";
+
+      if (productID == "") {
+        message = "Please select a product";
+        toastr.warning(message, "Product Components");
+        return;
+      }
+
+      Fetch(`/components/getcomponents/${productID}`, (result) => {
+        if (result.msg === "success") {
+          let data = result.data;
+          let servingperstock = [];
+          let maxProductionQuantity = 0;
+
+          if (data.length != 0) {
+            let components = data;
+            $("#datatable-components tbody").empty();
+            components.forEach((item) => {
+              console.log(
+                Math.floor(parseFloat(item.stock) / parseFloat(item.quantity))
+              );
+
+              servingperstock.push(
+                Math.floor(parseFloat(item.stock) / parseFloat(item.quantity))
+              );
+
+              const tr = $("<tr>").append(
+                $("<td>", {
+                  text: item.materialid,
+                  "data-label": "Material ID",
+                  class: "custom-mobile-align",
+                }),
+                $("<td>", {
+                  text: item.materialname,
+                  "data-label": "Material Name",
+                  class: "custom-mobile-align",
+                }),
+                $("<td>", {
+                  text: item.quantity,
+                  "data-label": "Unit(Deduct)",
+                  class: "custom-mobile-align",
+                }),
+                $("<td>", {
+                  text: item.stock,
+                  "data-label": "Stock",
+                  class: "custom-mobile-align",
+                })
+              );
+
+              $("#datatable-components tbody").append(tr);
+            });
+
+            maxProductionQuantity = Math.min(...servingperstock);
+            $("#maxProductionQuantity").text(maxProductionQuantity);
+          } else {
+            console.error(result.msg);
+          }
+        } else {
+          console.error(result.msg);
+        }
+      });
+    });
+
+    function LoadList() {
+      Fetch("/components/getproductcomponents", (result) => {
+        let activeData = [];
+        let dropdownID = "productDropdown";
+        let inputID = "product";
+        let hiddenID = "productID";
+        let container = result.data;
+        //console.log(container)
+        $.each(container, (key, item) => {
+          let name = item.name;
+          let id = item.id;
+          activeData.push({
+            display: name,
+            value: id,
+          });
+        });
+
+        AddDropdownData(dropdownID, activeData, inputID, hiddenID);
+      });
+    }
+
+    function LoadTable() {
+      Fetch("/production/load", (result) => {
+        if (result.msg === "success") {
+          populatedatatable(result.data);
+        } else {
+          console.error(result.msg);
+        }
+      });
+    }
+
+    function populatedatatable(data) {
+      console.log(data);
+      const tableBody = $("#datatable-production tbody");
+      tableBody.empty();
+
+      if (data.length === 0) {
+        const tr = $("<tr>").append(
+          $("<td>", {
+            colspan: 5,
+            class: "text-center",
+            text: "No Data Matched",
+          })
+        );
+        tableBody.append(tr);
+      } else {
+        data.forEach((item) => {
+          const tr = $("<tr>").append(
+            $("<td>", {
+              text: item.id,
+              "data-label": "ID",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.productid,
+              "data-label": "Product",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.quantity,
+              "data-label": "Quantity",
+              class: "custom-mobile-align",
+            }),
+
+            $("<td>", {
+              text: item.status,
+              "data-label": "Quantity",
+              class: "custom-mobile-align",
+            }),
+
+            $("<td>", {
+              html: `<span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+              <span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>`,
+              "data-label": "Action",
+              class: "actionWidth",
+            })
+          );
+
+          tableBody.append(tr);
+        });
+      }
+    }
+    LoadList();
+    LoadTable();
+  });
+</script>
