@@ -1,0 +1,276 @@
+<script>
+  $(document).ready(function () {
+    let id = "";
+    let name = "";
+    let cost = "";
+    LoadTable();
+    LoadList();
+
+    $("#datatable tbody").on("click", "tr", function () {
+      var dataRow = [];
+      $(this)
+        .closest("tr")
+        .find("td")
+        .each(function () {
+          dataRow.push($(this).text());
+        });
+      console.log(dataRow);
+      id = dataRow[0];
+      name = dataRow[1];
+      cost = dataRow[3];
+    });
+
+    $(document).on("click", "#addBtn", function () {
+      let material = $("#material").val();
+      let unit = $("#unit").val();
+      let price = $("#price").val();
+      let message = "";
+
+      console.log(material, unit, price);
+
+      if (material == "") {
+        message += "[Material] ";
+      }
+
+      if (unit == "-") {
+        message += "[Unit] ";
+      }
+
+      if (price == "") {
+        message += "[Price] ";
+      }
+
+      if (message != "") {
+        warning("Required", message);
+      } else {
+        $.ajax({
+          type: "POST",
+          url: "/materialinventory/save",
+          data: {
+            material: material,
+            unit: unit,
+            price: RemoveCurrencyFormatting(price),
+          },
+          success: function (result) {
+            if (result.msg == "success") {
+              LoadTable();
+              success("Success", "New inventory successfully added!");
+            }
+          },
+          error: function (error) {
+            warning("Error", error);
+          },
+        });
+      }
+    });
+
+    $(document).on("click", "#editBtn", function () {
+      $("#idmodal").val(id);
+      $("#materialmodal").val("");
+      $("#unitmodal").val("-");
+      $("#costmodal").val("");
+    });
+
+    $(document).on("click", "#replenishBtn", function () {
+      $("#idstockmodal").val(id);
+      $("#stocksmodal").val("");
+    });
+
+    $(document).on("click", "#updateBtn", function () {
+      let material = $("#materialmodal").val();
+      let unit = $("#unitmodal").val();
+      let price = $("#costmodal").val();
+      let message = "";
+
+      console.log(material, unit, price);
+
+      if (material == "" && unit == "-" && price == "") {
+        message += "Please fill up at least one field";
+      }
+
+      if (message != "") {
+        warning("Required", message);
+      } else {
+        Upsert(
+          "POST",
+          "/materialinventory/update",
+          {
+            id: id,
+            material: material,
+            unit: unit,
+            price: RemoveCurrencyFormatting(price),
+          },
+          function (result) {
+            if (result.msg == "success") {
+              $("#editModal").modal("hide");
+              LoadTable();
+              success("Success", "New inventory successfully updated!");
+            }
+            console.log(result);
+          }
+        );
+      }
+    });
+
+    $(document).on("click", "#updateStockBtn", function () {
+      let quantity = $("#stocksmodal").val();
+      let message = "";
+
+      if (quantity == "") {
+        message += "Quantity is required";
+      }
+
+      if (message != "") {
+        warning("Required", message);
+      } else {
+        Upsert(
+          "POST",
+          "/materialinventory/update",
+          { id: id, quantity: quantity },
+          function (result) {
+            if (result.msg == "success") {
+              $("#replenishmentModal").modal("hide");
+              LoadTable();
+              success("Success", "New inventory successfully updated!");
+            }
+            console.log(result);
+          }
+        );
+      }
+    });
+
+    function LoadTable() {
+      $.ajax({
+        url: "/materialinventory/load",
+        method: "GET",
+        dataType: "json",
+        success: function (data) {
+          console.log(data);
+          if (data.msg === "success") {
+            populatedatatable(data.data);
+          } else {
+            console.error(data.msg);
+          }
+        },
+        error: function (error) {
+          console.error(error);
+        },
+      });
+    }
+
+    function populatedatatable(data) {
+      console.log(data);
+      const tableBody = $("#datatable tbody");
+      tableBody.empty();
+
+      if (data.length === 0) {
+        const tr = $("<tr>").append(
+          $("<td>", {
+            colspan: 6,
+            class: "text-center",
+            text: "No Data Matched",
+          })
+        );
+        tableBody.append(tr);
+      } else {
+        data.forEach((item) => {
+          action = `<span class="editbutton" id="editBtn" name="editBtn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit" style="color: rgb(99, 115, 129);"></i></span>
+          <span class="editbutton" id="replenishBtn" name="replenishBtn" data-toggle="modal" data-target="#replenishmentModal"><i class="fas fa-plus" style="color: rgb(99, 115, 129);"></i></span>`;
+
+          const tr = $("<tr>").append(
+            $("<td>", {
+              text: item.id,
+              "data-label": "ID",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.name,
+              "data-label": "Name",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.unit,
+              "data-label": "Stocks",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.stock,
+              "data-label": "Stocks",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: formatCurrency(item.cost),
+              "data-label": "Stocks",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              html: action,
+              "data-label": "Action",
+              class: "actionWidth",
+            })
+          );
+
+          tableBody.append(tr);
+        });
+      }
+    }
+
+    function LoadList() {
+      $.ajax({
+        type: "GET",
+        url: "/product/getproductinventory",
+        success: function (result) {
+          let activeData = [];
+          let dropdownID = "productDropdown";
+          let inputID = "product";
+          let hiddenID = "productID";
+          let container = result.data;
+          //console.log(container);
+          $.each(container, (key, item) => {
+            let name = item.name;
+            let id = item.id;
+            activeData.push({
+              display: name,
+              value: id,
+            });
+          });
+          // AddDropdownData(dropdownID, activeData, inputID, hiddenID);
+        },
+        error: function (err) {
+          warning("Warning", err);
+        },
+      });
+    }
+
+    function filterTableRows() {
+      const searchQuery = $("#search-input").val().trim().toLowerCase();
+      let foundMatches = false;
+
+      $("#no-match-row").remove();
+
+      $("#datatable tbody tr").each(function () {
+        const rowData = $(this).text().toLowerCase();
+        if (rowData.includes(searchQuery)) {
+          $(this).show();
+          foundMatches = true;
+        } else {
+          $(this).hide();
+        }
+      });
+
+      if (!foundMatches) {
+        const noMatchRow = $("<tr>").append(
+          $("<td>", {
+            colspan: 6,
+            class: "text-center",
+            text: "No Data Matched",
+          })
+        );
+        $("#datatable tbody").append(noMatchRow);
+        noMatchRow.attr("id", "no-match-row");
+      }
+    }
+
+    $("#search-input").on("input", filterTableRows);
+  });
+</script>

@@ -1,0 +1,252 @@
+<script>
+  $(document).ready(function () {
+    $(document).on("click", "#addBtn", function () {
+      let quantity = $("#quantity").val();
+      let productID = $("#productID").val();
+      let message = "";
+
+      if (quantity == "") {
+        message = "Please enter quantity";
+        toastr.warning(message, "Production");
+        return;
+      }
+
+      if (productID == "") {
+        message = "Please select a product";
+        toastr.warning(message, "Production");
+        return;
+      }
+
+      Upsert(
+        "POST",
+        `/production/addproduction`,
+        { productID: productID, quantityProduction: quantity },
+        (result) => {
+          if (result.msg === "success") {
+            toastr.success("Production added successfully", "Production");
+            LoadTable();
+          } else {
+            console.error(result.msg);
+          }
+        }
+      );
+    });
+
+    $(document).on("input", "#quantity", function () {
+      let quantity = $("#quantity").val();
+      let maxquantity = $("#maxProductionQuantity").html();
+
+      console.log(quantity, maxquantity);
+
+      if (parseFloat(quantity) > parseFloat(maxquantity)) {
+        toastr.warning(
+          "Quantity cannot be greater than " + maxquantity,
+          "Production"
+        );
+        $("#quantity").val(maxquantity);
+      }
+    });
+
+    $(document).on("click", "#productDropdown", function () {
+      console.log("clicked");
+      let productID = $("#productID").val();
+      let components = [];
+      let message = "";
+
+      if (productID == "") {
+        message = "Please select a product";
+        toastr.warning(message, "Product Components");
+        return;
+      }
+
+      Fetch(`/components/getcomponents/${productID}`, (result) => {
+        if (result.msg === "success") {
+          let data = result.data;
+          let servingperstock = [];
+          let maxProductionQuantity = 0;
+
+          if (data.length != 0) {
+            let components = data;
+            $("#datatable-components tbody").empty();
+            components.forEach((item) => {
+              console.log(
+                Math.floor(parseFloat(item.stock) / parseFloat(item.quantity))
+              );
+
+              servingperstock.push(
+                Math.floor(parseFloat(item.stock) / parseFloat(item.quantity))
+              );
+
+              const tr = $("<tr>").append(
+                $("<td>", {
+                  text: item.materialid,
+                  "data-label": "Material ID",
+                  class: "custom-mobile-align",
+                }),
+                $("<td>", {
+                  text: item.materialname,
+                  "data-label": "Material Name",
+                  class: "custom-mobile-align",
+                }),
+                $("<td>", {
+                  text: item.quantity,
+                  "data-label": "Unit(Deduct)",
+                  class: "custom-mobile-align",
+                }),
+                $("<td>", {
+                  text: item.stock,
+                  "data-label": "Stock",
+                  class: "custom-mobile-align",
+                })
+              );
+
+              $("#datatable-components tbody").append(tr);
+            });
+
+            maxProductionQuantity = Math.min(...servingperstock);
+            $("#maxProductionQuantity").text(maxProductionQuantity);
+          } else {
+            console.error(result.msg);
+          }
+        } else {
+          console.error(result.msg);
+        }
+      });
+    });
+
+    $(document).on("click", "#doneBtn", function () {
+      let id = $(this).closest("tr").find("td:eq(0)").text();
+
+      Upsert(
+        "PUT",
+        `/production/approve`,
+        { id: id},
+        (result) => {
+          if (result.msg === "success") {
+            toastr.success("Production approved", "Production");
+            LoadTable();
+          } else {
+            console.error(result.msg);
+          }
+        }
+      );
+    });
+
+    // $(document).on("click", "#cancelBtn", function () {
+    //   let id = $(this).closest("tr").find("td:eq(0)").text();
+    //   let status = StatusMessage.INACT;
+
+    //   Upsert("PUT", `/production/approve/${id}`, { id: id }, (result) => {
+    //     if (result.msg === "success") {
+    //       toastr.success("Production canceled", "Production");
+    //       $("#datatable-production tbody").empty();
+    //       LoadList();
+    //     } else {
+    //       console.error(result.msg);
+    //     }
+    //   });
+    // });
+
+    function LoadList() {
+      Fetch("/components/getproductcomponents", (result) => {
+        let activeData = [];
+        let dropdownID = "productDropdown";
+        let inputID = "product";
+        let hiddenID = "productID";
+        let container = result.data;
+        //console.log(container)
+        $.each(container, (key, item) => {
+          let name = item.name;
+          let id = item.id;
+          activeData.push({
+            display: name,
+            value: id,
+          });
+        });
+
+        AddDropdownData(dropdownID, activeData, inputID, hiddenID);
+      });
+    }
+
+    function LoadTable() {
+      Fetch("/production/load", (result) => {
+        if (result.msg === "success") {
+          populatedatatable(result.data);
+        } else {
+          console.error(result.msg);
+        }
+      });
+    }
+
+    function populatedatatable(data) {
+      console.log(data);
+      const tableBody = $("#datatable-production tbody");
+      tableBody.empty();
+
+      if (data.length === 0) {
+        const tr = $("<tr>").append(
+          $("<td>", {
+            colspan: 5,
+            class: "text-center",
+            text: "No Data Matched",
+          })
+        );
+        tableBody.append(tr);
+      } else {
+        data.forEach((item) => {
+          let action = "";
+
+          if (item.status == "IN PROGRESS") {
+            action = `<span class="editbutton" id="doneBtn" name="doneBtn"><i class="fas fa-check" style="color: rgb(99, 115, 129);"></i></span>
+              <span class="editbutton" id="cancelBtn" name="cancelBtn"><i class="fas fa-times" style="color: rgb(99, 115, 129);"></i></span>`;
+          }
+
+          const statusBackground = getStatusBackground(item.status);
+          const containerBackground = getContainerBackground(item.status);
+
+          const tr = $("<tr>").append(
+            $("<td>", {
+              text: item.id,
+              "data-label": "ID",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.date,
+              "data-label": "Date",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.productid,
+              "data-label": "Product",
+              class: "custom-mobile-align",
+            }),
+            $("<td>", {
+              text: item.quantity,
+              "data-label": "Quantity",
+              class: "custom-mobile-align",
+            }),
+
+            $("<td>", {
+              class: "custom-mobile-align",
+              "data-label": "Status",
+            }).append(
+              $("<div>", { class: containerBackground }).append(
+                $("<span>", { text: item.status, class: statusBackground })
+              )
+            ),
+
+            $("<td>", {
+              html: action,
+              "data-label": "Action",
+              class: "actionWidth",
+            })
+          );
+
+          tableBody.append(tr);
+        });
+      }
+    }
+    LoadList();
+    LoadTable();
+  });
+</script>

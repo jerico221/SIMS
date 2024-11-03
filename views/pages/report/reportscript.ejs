@@ -4,6 +4,28 @@
 
     LoadingState();
 
+    //#region Sales Report
+    $(document).on("click", "#generateBtn", function () {
+      const date = $("#dateRange").val();
+      let formattedDate = formatDate(date);
+
+      Fetch("/reports/salesgraph/" + formattedDate, function (result) {
+        Upsert(
+          "POST",
+          "/pdf/generatepdf",
+          {
+            detailsdata: result.data,
+            overalltotal: result.overalltotal,
+            daterange: formattedDate,
+          },
+          function (result) {
+            window.open(`/pdf/generatepdf/Test`, "_blank");
+          }
+        );
+      });
+    });
+    //#endregion
+
     //#region Date Ranger Picker
     $("#dateRange").daterangepicker({
       opens: "right",

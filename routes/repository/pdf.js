@@ -1,17 +1,11 @@
 const PdfMake = require("pdfmake");
 const path = require("path");
 
-const { Validator } = require("./controller/validator");
-
 const regularfont = path.join(__dirname, "/fonts/roboto-regular-webfont.ttf");
 const boldfont = path.join(__dirname, "/fonts/roboto-bold-webfont.ttf");
 
-/* GET home page. */
-router.get("/", function (req, res, next) {
-  Validator(req, res, "accesslayout");
-});
+exports.GeneratePDF = (reportContent) => {
 
-exports.GeneratePDF = () => {
   return new Promise((resolve, reject) => {
     var fonts = {
       Roboto: {

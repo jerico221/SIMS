@@ -3,7 +3,10 @@ const {
   PDFTableHeaderFormatter,
   PDFTemplateFormatter,
   PDFContentFormatter,
+  GetCurrentDatetime,
+  GetCurrentDate,
 } = require("./repository/helper");
+const { GeneratePDF } = require("./repository/pdf");
 var router = express.Router();
 
 router.get("/", function (req, res, next) {
@@ -12,21 +15,68 @@ router.get("/", function (req, res, next) {
 
 module.exports = router;
 
-router.get("/generatepdf", (req, res) => {
+let pdfBuffer = "";
+
+router.post("/generatepdf", (req, res) => {
   try {
-    const { headerdata, detailsdata } = GeneratePDF();
-    let header = PDFTableHeaderFormatter([headerdata]);
+    const { detailsdata, overalltotal, daterange } = req.body;
 
-    let details = PDFContentFormatter([detailsdata]);
+    let headerConstant = ["Product", "Price", "Quantity", "Total"];
+    let header = PDFTableHeaderFormatter(headerConstant);
 
-    // PDFTemplateFormatter("Sales Report", ["*", "*", "*", "*"]);
+    let detailcontent = [
+      {
+        product: "Itlog",
+        price: "10",
+        quantity: "1",
+        total: "10",
+        cost: "1",
+      },
+      {
+        product: "Porck Chop",
+        price: "70",
+        quantity: "1",
+        total: "70",
+        cost: "1",
+      },
+      {
+        product: "Chorizo",
+        price: "20",
+        quantity: "1",
+        total: "20",
+        cost: "1",
+      },
+    ];
+    let details = PDFContentFormatter(detailsdata);
+
+    let tablewitdh = [];
+    headerConstant.forEach((i) => {
+      tablewitdh.push("*");
+    });
+
+    GeneratePDF(
+      PDFTemplateFormatter(
+        "Sales Report",
+        header,
+        details,
+        tablewitdh,
+        overalltotal,
+        daterange
+      )
+    )
+      .then((result) => {
+        pdfBuffer = result;
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 
     res.status(200).json({
       msg: "PDF generated successfully",
-      data: {
-        header,
-        details,
-      },
+      // data: {
+      //   header,
+      //   details,
+      // },
     });
   } catch (error) {
     res.status(500).json({
@@ -35,13 +85,14 @@ router.get("/generatepdf", (req, res) => {
   }
 });
 
-router.get("/generatepdf/:filename/:currentDate", async (req, res, next) => {
+router.get("/generatepdf/:filename/", async (req, res, next) => {
   try {
-    const { filename, currentDate } = req.params;
+    const { filename } = req.params;
+
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename=${filename}_${currentDate}.pdf`
+      `attachment; filename=${filename}_${GetCurrentDate()}.pdf`
     );
 
     res.send(pdfBuffer);
