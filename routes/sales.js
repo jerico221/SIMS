@@ -228,7 +228,6 @@ router.get("/getdetails/:id", (req, res) => {
 
       arrayJson.forEach((key, item) => {
         const { id, name, price, quantity } = key;
-        console.log(id, name, price, quantity);
         resultJson.push({
           id: id,
           name: name,

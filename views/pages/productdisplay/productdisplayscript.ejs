@@ -27,8 +27,8 @@
         .each(function () {
           dataRow.push($(this).text());
         });
-      current_count = parseFloat(dataRow[2]);
-      current_price = parseFloat(RemoveCurrencyFormatting(dataRow[1]));
+      current_count = parseFloat(dataRow[3]);
+      current_price = parseFloat(RemoveCurrencyFormatting(dataRow[2]));
       console.log(dataRow);
       console.log(current_row_index);
     });
@@ -83,12 +83,12 @@
       cart.forEach((item) => {
         if (item.id == this.id) {
           current_count += 1;
-          $(`#carttable tr:eq(${current_row_index}) td:eq(2)`).text(
+          $(`#carttable tr:eq(${current_row_index}) td:eq(3)`).text(
             `${current_count}`
           );
 
           let current_subtotal = current_count * current_price;
-          $(`#carttable tr:eq(${current_row_index}) td:eq(3)`).text(
+          $(`#carttable tr:eq(${current_row_index}) td:eq(4)`).text(
             `${formatCurrency(current_subtotal)}`
           );
 
@@ -99,12 +99,12 @@
 
       details.forEach((item) => {
         if (item.id == this.id) {
-          $(`#carttable tr:eq(${current_row_index}) td:eq(2)`).text(
+          $(`#carttable tr:eq(${current_row_index}) td:eq(3)`).text(
             `${current_count}`
           );
 
           let current_subtotal = current_count * current_price;
-          $(`#carttable tr:eq(${current_row_index}) td:eq(3)`).text(
+          $(`#carttable tr:eq(${current_row_index}) td:eq(4)`).text(
             `${formatCurrency(current_subtotal)}`
           );
 
@@ -144,7 +144,7 @@
       cart.forEach((item) => {
         if (item.id == this.id) {
           current_count -= 1;
-          $(`#carttable tr:eq(${current_row_index}) td:eq(2)`).text(
+          $(`#carttable tr:eq(${current_row_index}) td:eq(3)`).text(
             `${current_count}`
           );
           if (current_count == 0) {
@@ -156,7 +156,7 @@
             ).text(`${current_count}`);
 
             let current_subtotal = current_count * current_price;
-            $(`#carttable tr:eq(${current_row_index}) td:eq(3)`).text(
+            $(`#carttable tr:eq(${current_row_index}) td:eq(4)`).text(
               `${formatCurrency(current_subtotal)}`
             );
           }
@@ -168,7 +168,7 @@
 
       details.forEach((item) => {
         if (item.id == this.id) {
-          $(`#carttable tr:eq(${current_row_index}) td:eq(2)`).text(
+          $(`#carttable tr:eq(${current_row_index}) td:eq(3)`).text(
             `${current_count}`
           );
           if (current_count == 0) {
@@ -180,7 +180,7 @@
             ).text(`${current_count}`);
 
             let current_subtotal = current_count * current_price;
-            $(`#carttable tr:eq(${current_row_index}) td:eq(3)`).text(
+            $(`#carttable tr:eq(${current_row_index}) td:eq(4)`).text(
               `${formatCurrency(current_subtotal)}`
             );
           }
@@ -250,10 +250,13 @@
         const tr = $("<tr>").append(
           $("<td>", {
             html: $(
-              `<img src="${item.image}" alt="Product Image" class="product-image" style="max-width: 100px; max-height: 85px;"/>
-                <p>${item.name}</p>`
+              `<img src="${item.image}" alt="Product Image" class="product-image" style="max-width: 100px; max-height: 85px;"/>`
             ),
             "data-label": "Product Image",
+          }),
+          $("<td>", {
+            text: item.name,
+            "data-label": "Product Name",
           }),
           $("<td>", {
             text: formatCurrency(item.price),
@@ -385,8 +388,7 @@
               }
             }
           );
-        }
-        else{
+        } else {
           ProcessData();
         }
 

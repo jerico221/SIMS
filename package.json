@@ -4,8 +4,7 @@
   "private": true,
   "scripts": {
     "prestart": "npm install",
-    "dev": "nodemon ./bin/www",
-    "start": "node ./bin/www"
+    "start": "nodemon ./bin/www"
   },
   "dependencies": {
     "@getbrevo/brevo": "^2.2.0",
