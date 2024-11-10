@@ -168,9 +168,7 @@
           </div>
 
           <hr />
-          <h6 class="m-0 font-weight-bold mt-2 label-title h4">
-           Materials
-          </h6>
+          <h6 class="m-0 font-weight-bold mt-2 label-title h4">Materials</h6>
           <div class="row mt-1">
             <div class="col">
               <div class="input-group mb-3">
@@ -253,5 +251,145 @@
   </div>
 </div>
 
-
 <!-- View Components Modal -->
+<div
+  class="modal fade"
+  id="editModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header custom-bg">
+        <h5 class="modal-title" id="exampleModalLabel">Product Components</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="custom-modal-body">
+        <div class="card">
+          <div class="card-header py-2 header-bg">
+            <h6 class="m-0 font-weight-bold table-title">
+              View Product Components:
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="row mb-2 justify-content-center">
+              <div class="col-md-6">
+                <div class="input-group mb-3">
+                  <input
+                    autocomplete="off"
+                    id="idmodal"
+                    name="idmodal"
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter new idmodal"
+                    aria-label="idmodal"
+                    aria-describedby="basic-addon1"
+                    disabled
+                  />
+                  <div class="input-group-append">
+                    <span class="input-group-text">ID</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="input-group mb-3">
+                  <input
+                    autocomplete="off"
+                    id="namemodal"
+                    name="namemodal"
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter new name"
+                    aria-label="namemodal"
+                    aria-describedby="basic-addon1"
+                    disabled
+                  />
+                  <div class="input-group-append">
+                    <span class="input-group-text">Material Name</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col">
+                <div class="card">
+                  <div class="card-header py-2 header-bg">
+                    <h6 class="m-0 font-weight-bold table-title">Components</h6>
+                    <div class="row mt-3">
+                      <div class="col-md-3">
+                        <div class="input-group mb-3">
+                          <input
+                            type="text"
+                            readonly
+                            class="form-control"
+                            id="costmodal"
+                            placeholder="Cost"
+                          />
+                          <div class="input-group-append">
+                            <span class="input-group-text">Cost</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="table-responsive border">
+                      <table
+                        id="datatable-component-modal"
+                        class="table table-bordered custom-mobile-table"
+                        width="100%"
+                        cellspacing="10"
+                      >
+                        <thead class="table-header">
+                          <tr>
+                            <th>Material ID</th>
+                            <th>Material Name</th>
+                            <th>Unit(Deduct)</th>
+                            <th>Cost</th>
+                            <th>Quantity</th>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <tbody></tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          type="button"
+          id="closeBtn"
+          class="btn btn-outline-inventory"
+          data-dismiss="modal"
+        >
+          Close
+        </button>
+        <!-- <button type="button" id="updateBtn" class="btn btn-outline-inventory">
+          <span id="btn-label-modal">Update</span>
+          <span
+            id="btnSpinner-modal"
+            class="spinner-border spinner-border-sm d-none"
+            role="status"
+            aria-hidden="true"
+          ></span> -->
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

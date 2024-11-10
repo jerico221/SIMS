@@ -24,6 +24,10 @@
         (result) => {
           if (result.msg === "success") {
             toastr.success("Production added successfully", "Production");
+            $("#datatable-components tbody").empty();
+            $("#quantity").val("");
+            $("#product").val("");
+            $("#maxProductionQuantity").text("");
             LoadTable();
           } else {
             console.error(result.msg);
@@ -117,19 +121,27 @@
     $(document).on("click", "#doneBtn", function () {
       let id = $(this).closest("tr").find("td:eq(0)").text();
 
-      Upsert(
-        "PUT",
-        `/production/approve`,
-        { id: id},
-        (result) => {
-          if (result.msg === "success") {
-            toastr.success("Production approved", "Production");
-            LoadTable();
-          } else {
-            console.error(result.msg);
-          }
+      Upsert("PUT", `/production/approve`, { id: id }, (result) => {
+        if (result.msg === "success") {
+          toastr.success("Production approved", "Production");
+          LoadTable();
+        } else {
+          console.error(result.msg);
         }
-      );
+      });
+    });
+
+    $(document).on("click", "#cancelBtn", function () {
+      let id = $(this).closest("tr").find("td:eq(0)").text();
+
+      Upsert("PUT", `/production/cancel`, { id: id }, (result) => {
+        if (result.msg === "success") {
+          toastr.success("Production canceled", "Production");
+          LoadTable();
+        } else {
+          console.error(result.msg);
+        }
+      });
     });
 
     // $(document).on("click", "#cancelBtn", function () {
@@ -246,6 +258,7 @@
         });
       }
     }
+
     LoadList();
     LoadTable();
   });

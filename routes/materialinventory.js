@@ -84,14 +84,12 @@ router.post("/save", (req, res) => {
   }
 });
 
-router.post("/update", (req, res) => {
+router.post("/update", async (req, res) => {
   try {
     const { id, material, unit, price, quantity } = req.body;
     let material_inventory_data = [];
     let material_inventory_columns = [];
     let material_inventory_args = [];
-
-    console.log(unit);
 
     if (material) {
       material_inventory_data.push(material);
@@ -99,7 +97,12 @@ router.post("/update", (req, res) => {
     }
 
     if (quantity) {
-      material_inventory_data.push(quantity);
+      let current_stock = await GetMaterialData(id);
+
+      let updateStock =
+        parseFloat(current_stock[0].stock) + parseFloat(quantity);
+      material_inventory_data.push(updateStock);
+
       material_inventory_columns.push("stock");
     }
 
@@ -119,21 +122,25 @@ router.post("/update", (req, res) => {
     material_inventory_data.push(id);
     material_inventory_args.push("id");
 
-    let material_inventory = UpdateStatement(
-      "material_inventory",
-      "mi",
-      material_inventory_columns,
-      material_inventory_args
-    );
+    async function ProcessData() {
+      let material_inventory = UpdateStatement(
+        "material_inventory",
+        "mi",
+        material_inventory_columns,
+        material_inventory_args
+      );
 
-    Update(material_inventory, material_inventory_data, (error, result) => {
-      if (error) {
-        console.log(error);
-        return res.status(500).send({ msg: error });
-      } else {
-        return res.status(200).send({ msg: "success" });
-      }
-    });
+      Update(material_inventory, material_inventory_data, (error, result) => {
+        if (error) {
+          console.log(error);
+          return res.status(500).send({ msg: error });
+        } else {
+          return res.status(200).send({ msg: "success" });
+        }
+      });
+    }
+
+    ProcessData();
   } catch (error) {
     res.status(500).send({ msg: error });
   }
@@ -164,3 +171,28 @@ router.get("/getmaterial/:id", (req, res) => {
     res.status(500).send({ msg: error });
   }
 });
+
+//#region Functions
+async function GetMaterialData(materialId) {
+  return new Promise((resolve, reject) => {
+    let sql = SelectStatement(
+      "select mi_stock from material_inventory where mi_id = ?",
+      [materialId]
+    );
+
+    Select(sql, (error, result) => {
+      if (error) {
+        reject(error);
+      }
+
+      if (result.length != 0) {
+        let data = DataModeling(result, "mi_");
+
+        resolve(data);
+      } else {
+        resolve(result);
+      }
+    });
+  });
+}
+//#endregion

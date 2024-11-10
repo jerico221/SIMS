@@ -126,11 +126,12 @@ router.get("/getcomponents/:id", (req, res) => {
   }
 });
 
-router.get("/getproductcomponents", (req, res) => {
+router.get("/getproductcomponents/:id", (req, res) => {
   try {
     const { id } = req.params;
     let sql = SelectStatement(
-      "select p_id, p_name from product inner join components on c_productid = p_id"
+      "select c_details as p_details from product inner join components on c_productid = p_id where c_id = ?",
+      [id]
     );
 
     Select(sql, (error, result) => {
@@ -141,7 +142,20 @@ router.get("/getproductcomponents", (req, res) => {
 
       if (result.length != 0) {
         let data = DataModeling(result, "p_");
-        return res.status(200).send({ msg: "success", data: data });
+        let details = JSON.parse(data[0].details);
+        let components = [];
+        for (const detail of details) {
+          const { materialID, materialname, unit, cost, quantity } = detail;
+
+          components.push({
+            materialid: materialID,
+            materialname: materialname,
+            quantity: quantity,
+            unit: unit,
+            cost: cost,
+          });
+        }
+        return res.status(200).send({ msg: "success", data: components });
       } else {
         return res.status(200).send({ msg: "success", data: result });
       }
