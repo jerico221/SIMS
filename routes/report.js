@@ -46,8 +46,11 @@ router.get("/salesgraph/:date", (req, res) => {
         let detailsJson = JSON.parse(details);
 
         for (const d of JSON.parse(detailsJson)) {
+          console.log(d);
+          
           const { id, name, price, quantity } = d;
-          let total = parseFloat(price) * parseFloat(quantity);
+  
+          let total = price * quantity;
 
           overalltotal += total;
 
@@ -56,19 +59,22 @@ router.get("/salesgraph/:date", (req, res) => {
           if (existingItem) {
             // If item exists, update the quantity
             existingItem.quantity += parseFloat(quantity);
-            existingItem.quantity += parseFloat(total);
+            existingItem.total += parseFloat(total);
           } else {
             // If item doesn't exist, add a new item to the data array
 
             data.push({
               name: name,
-              price: parseFloat(price).toFixed(2),
+              price: price,
               quantity: parseFloat(quantity),
-              total: total.toFixed(2),
+              total: total,
             });
           }
         }
       }
+
+      console.log(data);
+      
 
       res
         .status(200)

@@ -6,6 +6,7 @@ var logo =
 
 const moment = require("moment");
 const { Select } = require("./dbconnect");
+const { text } = require("body-parser");
 //#region SLQ SNIPPET CODE
 exports.InsertStatement = (tablename, prefix, columns) => {
   let cols = "";
@@ -303,6 +304,235 @@ exports.PDFTemplateFormatter = (
   return templateContent;
 };
 
+exports.PDFReceiptTemplateFormatter = (
+  cashier,
+  paymenttype,
+  cashreceived,
+  change,
+  items,
+  date,
+  posid,
+  total,
+  orid
+) => {
+  console.log(
+    cashier,
+    paymenttype,
+    cashreceived,
+    change,
+    ...items,
+    date,
+    posid,
+    total
+  );
+
+  let templateContent = {
+    pageSize: "A6",
+    pageMargins: [5, 20, 5, 5],
+    header: {
+      text: "Nava`s Kitchen",
+      fontSize: 12,
+      alignment: "center",
+      margin: [0, 0, 0, 0],
+    },
+    content: [
+      {
+        text: "Lot 31 Buckner St., Jade Heights, Victoria Homes, Tunasan 1773 Muntinlupa City, Philippines",
+        style: "header",
+      },
+      {
+        canvas: [
+          {
+            type: "line",
+            x1: 0,
+            y1: 10,
+            x2: 762,
+            y2: 10,
+            lineWidth: 1.3,
+            //x2: 517 portrait
+          },
+        ],
+      },
+      {
+        columns: [
+          {
+            width: "*",
+            text: `Order ID: ${orid}`,
+            fontSize: 8,
+          },
+          {
+            width: "*",
+            text: `${date} :Order Date`,
+            fontSize: 8,
+            alignment: "right",
+          },
+        ],
+        columnGap: 20,
+      },
+      {
+        columns: [
+          {
+            width: "*",
+            text: `Cashier: ${cashier}`,
+            fontSize: 8,
+          },
+          {
+            width: "*",
+            text: `${posid} :POS`,
+            fontSize: 8,
+            alignment: "right",
+          },
+        ],
+        columnGap: 20,
+      },
+      {
+        canvas: [
+          {
+            type: "line",
+            x1: 0,
+            y1: 10,
+            x2: 762,
+            y2: 10,
+            lineWidth: 1.3,
+            //x2: 517 portrait
+          },
+        ],
+      },
+      {
+        columns: [
+          {
+            width: "*",
+            text: "Item",
+            fontSize: 8,
+          },
+          {
+            width: "*",
+            text: "Quantity",
+            fontSize: 8,
+            alignment: "center",
+          },
+          {
+            width: "*",
+            text: "Subtotal",
+            fontSize: 8,
+            alignment: "right",
+          },
+        ],
+        columnGap: 20,
+      },
+      ...items,
+      {
+        canvas: [
+          {
+            type: "line",
+            x1: 0,
+            y1: 10,
+            x2: 762,
+            y2: 10,
+            lineWidth: 1.3,
+            //x2: 517 portrait
+          },
+        ],
+      },
+      {
+        columns: [
+          {
+            width: "*",
+            text: "Total",
+            fontSize: 8,
+          },
+
+          {
+            width: "*",
+            text: total,
+            fontSize: 8,
+            alignment: "right",
+          },
+        ],
+        columnGap: 20,
+      },
+      {
+        columns: [
+          {
+            width: "*",
+            text: "Tender",
+            fontSize: 8,
+          },
+
+          {
+            width: "*",
+            text: parseFloat(cashreceived).toFixed(2),
+            fontSize: 8,
+            alignment: "right",
+          },
+        ],
+        columnGap: 20,
+      },
+      {
+        columns: [
+          {
+            width: "*",
+            text: "Change",
+            fontSize: 8,
+          },
+
+          {
+            width: "*",
+            text: parseFloat(change).toFixed(2),
+            fontSize: 8,
+            alignment: "right",
+          },
+        ],
+        columnGap: 20,
+      },
+      {
+        text: "Unlimited Rice Everyday!",
+        style: "header",
+      },
+    ],
+    styles: {
+      header: {
+        fontSize: 8,
+        bold: true,
+        alignment: "center",
+      },
+      subheader: {
+        fontSize: 11,
+        alignment: "center",
+      },
+      tableheader: {
+        bold: true,
+        margin: [0, 5, 0, 5],
+        alignment: "center",
+        fontSize: 10,
+      },
+      tablecontent: {
+        fontSize: 9,
+        margin: [0, 2.5, 0, 2.5],
+        alignment: "center",
+      },
+      tabletitle: {
+        fontSize: 11,
+        alignment: "left",
+        margin: [0, 5, 0, 0],
+        bold: true,
+      },
+      costColumn: {
+        bold: true,
+        margin: [0, 5, 0, 5],
+        alignment: "left",
+        fontSize: 10,
+      },
+      costContent: {
+        fontSize: 9,
+        margin: [0, 2.5, 0, 2.5],
+        alignment: "left",
+      },
+    },
+  };
+
+  return templateContent;
+};
 exports.PDFSubheaderFormatter = (key, value) => {
   return {
     layout: "noBorders",
@@ -349,6 +579,38 @@ exports.PDFContentFormatter = (data = []) => {
 
     details.push(content);
   });
+
+  return details;
+};
+
+exports.ReceiptItemsFormatter = (items) => {
+  let details = [];
+  for (const i of items) {
+    const { id, name, price, quantity } = i;
+
+    details.push({
+      columns: [
+        {
+          width: "*",
+          text: name,
+          fontSize: 8,
+        },
+        {
+          width: "*",
+          text: quantity,
+          fontSize: 8,
+          alignment: "center",
+        },
+        {
+          width: "*",
+          text: (parseFloat(price) * parseFloat(quantity)).toFixed(2),
+          fontSize: 8,
+          alignment: "right",
+        },
+      ],
+      columnGap: 20,
+    });
+  }
 
   return details;
 };

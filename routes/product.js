@@ -234,7 +234,7 @@ router.get("/stockload", (req, res) => {
           c_name as p_category,
           p_isinventory,
           p_status ,
-          i_stock
+          i_stock as p_stock
           from product 
           inner join category on p_category = c_id
           left join inventory on i_productid = p_id

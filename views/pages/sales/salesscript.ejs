@@ -93,6 +93,31 @@
       });
     });
 
+    $(document).on("click", "#printBtn", function () {
+      Fetch(`/sales/getdetails/${id}`, (result) => {
+        console.log(result);
+
+        if (result.msg === "success") {
+          Upsert(
+            "POST",
+            "/pdf/generatereceipt",
+            {
+              data: result.data,
+              date: date,
+              posid: posid,
+              total: total,
+              id: id,
+            },
+            (result) => {
+              window.open(`/pdf/generatepdf/Receipt`, "_blank");
+            }
+          );
+        } else {
+          console.error(result.msg);
+        }
+      });
+    });
+
     $(document).on("click", "#filterBtn", function () {
       let date = formatDate($("#dateRange").val());
       let transactionid = $("#transactionid").val();
@@ -162,7 +187,9 @@
         data.forEach((item) => {
           let action = "";
           if (item.status === "SOLD") {
-            action = `<span class="editbutton" name="viewDetailBtn" id="viewDetailBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);"></i></span>`;
+            action = `<span class="editbutton mr-2" name="viewDetailBtn" id="viewDetailBtn"><i class="fas fa-eye" style="color: rgb(99, 115, 129);">
+              </i></span>
+            <span class="editbutton" name="printBtn" id="printBtn"><i class="fas fa-receipt" style="color: rgb(99, 115, 129);"></i></span>`;
           }
           const statusBackground = getStatusBackground(item.status);
           const containerBackground = getContainerBackground(item.status);
@@ -237,6 +264,38 @@
       }
     }
 
+    function refreshData() {
+      let date = formatDate($("#dateRange").val());
+      let transactionid = $("#transactionid").val();
+      let posid = $("#posid").val();
+      let message = "";
+
+      if (date == "" && transactionid == "" && posid == "") {
+        message += "Input at least one field to search";
+      }
+      if (message != "") {
+        warning("Required", message);
+      } else {
+        $.ajax({
+          type: "POST",
+          url: "/sales/filter",
+          data: {
+            transactionid: transactionid,
+            posid: posid,
+            date: date,
+          },
+          success: function (result) {
+            if (result.msg == "success") {
+              populatedatatable(result.data);
+            }
+          },
+          error: function (error) {
+            warning("Error", error);
+          },
+        });
+      }
+    }
+
     $("#search-input").on("input", filterTableRows);
 
     //#region Date Formatting
@@ -281,7 +340,7 @@
         .data("daterangepicker")
         .setStartDate(startDate.clone().subtract(7, "days"));
 
-      refreshData(dateRange);
+      refreshData();
     });
 
     $("#adjustDateForward").on("click", function () {
@@ -295,7 +354,7 @@
         .setStartDate(startDate.clone().add(7, "days"));
       $("#dateRange").data("daterangepicker").setEndDate(endDate);
 
-      refreshData(dateRange);
+      refreshData();
     });
     //#endregion
   });

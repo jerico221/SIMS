@@ -159,18 +159,35 @@ router.put("/cancel", async (req, res) => {
     async function ProcessData() {
       const productionData = await GetProduction(id);
       let productid = productionData[0].productid;
-      const inventoryData = await GetMaterialInventory(productid);
+      let product_quantity = productionData[0].quantity;
+      const productComponentData = await GetComponent(productid);
+      let product_components = productComponentData[0].details;
 
+      for (const component of JSON.parse(product_components)) {
+        const { materialID, quantity, unit } = component;
+        const inventoryData = await GetMaterialInventory(materialID);
+        let stockDeduction = quantity * parseFloat(product_quantity);
+        let update_stock = stockDeduction + inventoryData[0].stock;
 
-      console.log(newStock);
+        console.log(
+          `Material ID: ${materialID} Component Material Quantity: ${quantity} Production Quantity: ${product_quantity} stockDeduction: ${stockDeduction} stock: ${inventoryData[0].stock} update_stock: ${update_stock}`
+        );
 
-      let update_inventory = UpdateStatement(
-        "inventory",
-        "i",
-        ["stock"],
-        ["id"]
-      );
-      let inventory_data = [newStock, inventoryID];
+        let sql = UpdateStatement(
+          "material_inventory",
+          "mi",
+          ["stock"],
+          ["id"]
+        );
+
+        Update(sql, [update_stock, materialID], (error, result) => {
+          if (error) {
+            console.log(error);
+          }
+
+          console.log(result);
+        });
+      }
 
       let update_production = UpdateStatement(
         "production",
@@ -180,14 +197,6 @@ router.put("/cancel", async (req, res) => {
       );
 
       let production_data = [StatusMessage.CANC, id];
-
-      Update(update_inventory, inventory_data, (error, result) => {
-        if (error) {
-          console.log(error);
-
-          res.status(500).json({ msg: "error", data: error });
-        }
-      });
 
       Update(update_production, production_data, (error, result) => {
         if (error) {
@@ -241,8 +250,6 @@ async function UpdateMaterialInventory(materialId, stockDeduction, unit) {
       updatedStock = currentStock - stockDeduction;
     }
 
-    console.log(updatedStock);
-
     Update(sql, [updatedStock, materialId], (error, result) => {
       if (error) {
         reject(error);
@@ -260,8 +267,6 @@ async function GetMaterialInventory(materialId) {
       [materialId]
     );
 
-    console.log(sql);
-
     Select(sql, (error, result) => {
       if (error) {
         reject(error);
@@ -269,8 +274,6 @@ async function GetMaterialInventory(materialId) {
 
       if (result.length != 0) {
         let data = DataModeling(result, "mi_");
-
-        console.log(data);
 
         resolve(data);
       } else {
@@ -283,8 +286,6 @@ async function GetMaterialInventory(materialId) {
 async function GetProduction(id) {
   return new Promise((resolve, reject) => {
     let sql = SelectStatement("select * from production where p_id = ?", [id]);
-
-    console.log(sql);
 
     Select(sql, (error, result) => {
       if (error) {
@@ -307,8 +308,6 @@ async function GetProductInventory(productid) {
     let sql = SelectStatement("select * from inventory where i_productid = ?", [
       productid,
     ]);
-
-    console.log(sql);
 
     Select(sql, (error, result) => {
       if (error) {
