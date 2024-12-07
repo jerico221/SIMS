@@ -1,0 +1,56 @@
+<script>
+  $(document).ready(function () {
+    var audioElement = $("<audio>", {
+      id: "notificationSound",
+      src: "/assets/notify.wav",
+      type: "audio/wav",
+      text: "Your browser does not support the audio element.",
+    });
+
+    $("body").append(audioElement);
+
+    const socket = io();
+
+    socket.on("pushNotification", (data) => {
+      $("#alert-container").empty();
+      if (data.length != 0) {
+        let notifcount = 0;
+        data.forEach((item) => {
+          notifcount += 1;
+          let fontWeight = item.status === "UNREAD" ? "bold" : "normal";
+          let pushNotification = `
+              <div class="notification">
+                  <a id="${item.id}" class="dropdown-item d-flex align-items-center" href="/inventory">
+                      <div class="mr-3">
+                          <div class="icon-circle bg-warning">
+                              <i class="fas fa-box text-white"></i>
+                          </div>
+                      </div>
+                      <div class="message-div">
+                          <span style="font-weight: ${fontWeight}">Stocks Alert: ${item.name} is low! with Quantity of ${item.stock}</span>
+                      </div>
+                  </a>
+                  <div class="close-btn">
+                      <button class="btn btn-sm mr-3 drop-btn rounded-circle">
+                          <i class="fas fa-times" style="color: #e74a3b;"></i>
+                      </button>
+                  </div>
+              </div>`;
+
+          $("#alert-container").prepend(pushNotification);
+
+          if (localStorage.getItem(item.id) != item.stock) {
+            localStorage.setItem(item.id, item.stock);
+            info(
+              "Notification",
+              `${item.name} is low! current stock ${item.stock}`
+            );
+            $("#notificationSound")[0].play();
+          }
+
+          $("#badgecount").text(notifcount);
+        });
+      }
+    });
+  });
+</script>
