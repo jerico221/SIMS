@@ -165,6 +165,34 @@ router.get("/getproductcomponents/:id", (req, res) => {
   }
 });
 
+router.get("/getproduct", (req, res) => {
+  try {
+    let sql = SelectStatement(
+      `select 
+      p_id,
+      p_name
+      from components
+      inner join product on p_id = c_productid`,
+      []
+    );
+
+    Select(sql, (error, result) => {
+      if (error) {
+        return res.status(500).send({ msg: "error", data: error });
+      } else {
+        if (result.length != 0) {
+          let data = DataModeling(result, "p_");
+          return res.status(200).send({ msg: "success", data: data });
+        }
+
+        return res.status(200).send({ msg: "success", data: result });
+      }
+    });
+  } catch (error) {
+    res.status(500).send({ msg: error });
+  }
+});
+
 //#region Functions
 
 async function GetComponents(id) {

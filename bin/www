@@ -4,6 +4,8 @@
  * Module dependencies.
  */
 
+const { Select } = require("../routes/repository/dbconnect");
+
 var app = require("../app");
 var debug = require("debug")("salesinventorymanagementsystem:server");
 var http = require("http");
@@ -21,16 +23,36 @@ app.set("port", port);
 
 var server = http.createServer(app);
 
-// var socketIo = require("socket.io");
-// var io = socketIo(server);
+/**
+ * Socket.io setup.
+ */
 
-// io.on("connection", function (socket) {
-//   let message = "test";
+var socketIo = require("socket.io");
+var io = socketIo(server);
 
-//   setInterval(() => {
-//     socket.emit("agentchat", message);
-//   }, 1000);
-// });
+io.on("connection", function (socket) {
+  let message = "test";
+
+  setInterval(() => {
+    let sql = `
+    select 
+i_id as id,
+p_name as name,
+i_stock as stock
+from inventory
+inner join product on p_id = i_productid
+ where i_stock <= 15
+    `
+
+    Select(sql, (err, data) => {
+      if (err) {
+        console.log(err);
+      } else {
+        socket.emit("pushNotification", data);
+      }
+    });
+  }, 1000);
+});
 
 /**
  * Listen on provided port, on all network interfaces.
